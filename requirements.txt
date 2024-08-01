@@ -1,0 +1,8 @@
+LIBRARIES TO INSTALL
+
+- Logic processing:
+    + pysat
+    + python-sat
+
+- Graphic displaying:
+    + tkinter
