@@ -6,10 +6,13 @@
 
 # Tasks
 ## Phase 1: 4 days - deadline: 04/08/2024
-- [ ] Read input file: A
-- [ ] Write output file: A
+- [x] Read input file: A
+- [x] Write output file: A
 - [ ] Class Program: C
-- [ ] Think about the solution for the problem: A, B, C, D
+- [ ] Think about a solution for the problem: A
+- [ ] Think about a solution for the problem: B
+- [ ] Think about a solution for the problem: C
+- [ ] Think about a solution for the problem: D
 - [ ] GUI: B, D
 
 ## Phase 2: 4 days - deadline: 08/08/2024
