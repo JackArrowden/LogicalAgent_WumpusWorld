@@ -8,22 +8,23 @@
 ## Phase 1: 4 days - deadline: 04/08/2024
 - [x] Read input file: A
 - [x] Write output file: A
-- [ ] Class Program: C
-- [ ] Think about a solution for the problem: A
-- [ ] Think about a solution for the problem: B
-- [ ] Think about a solution for the problem: C
-- [ ] Think about a solution for the problem: D
-- [ ] GUI: B, D
+- [x] Think about a solution for the problem: A
+- [x] Think about a solution for the problem: B
+- [x] Think about a solution for the problem: C
+- [x] Think about a solution for the problem: D
+- [x] GUI: B
+- [x] GUI: D
 
 ## Phase 2: 4 days - deadline: 08/08/2024
-- [ ] GUI
-- [ ] Implement PL_Resolution algorithm
-- [ ] Implement Forward Chaining algorithm
-- [ ] Implement Backward Chaining algorithm
-- [ ] Class Agent
+- [ ] GUI - Map showing: B
+- [ ] GUI - Map showing: D
+- [ ] Class Program: A
+- [ ] Class KB and co.: C
 
 ## Phase 3: 4 days - deadline: 12/08/2024
-- [ ] GUI
+- [ ] GUI - Final GUI: B
+- [ ] GUI - Final GUI: D
+- [ ] Class Agent: C
 
 ## Phase 4: 4 days - deadline: 16/08/2024
 - [ ] Report summary
