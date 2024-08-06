@@ -9,10 +9,19 @@ class Program:
         self.mapHPotion = [[False for _ in range(10)] for _ in range(10)] # 400
         self.mapGold = [[False for _ in range(10)] for _ in range(10)] # 500
         ###
-        # Stench: 600
-        # Breeze: 700
-        # Whiff: 800
-        # Glow: 900
+        # Save cell:     1->100
+        # Wumpus:      101->200
+        # Pit:         201->300
+        # Potion Gas:  301->400
+        # Heal Potion: 401->500
+        # Gold:        501->600
+        # Stench:      601->700
+        # Breeze:      701->800
+        # Whiff:       801->900
+        # Glow:        901->1000
+        # Save cell:  1001->1100
+        # Visted:     1101->1200
+        # Reliable:   1201->1300
         ###
         self.getMap(file)
         
