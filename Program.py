@@ -9,19 +9,19 @@ class Program:
         self.mapHPotion = [[False for _ in range(10)] for _ in range(10)] # 400
         self.mapGold = [[False for _ in range(10)] for _ in range(10)] # 500
         ###
-        # Save cell:     1->100
-        # Wumpus:      101->200
-        # Pit:         201->300
-        # Potion Gas:  301->400
-        # Heal Potion: 401->500
-        # Gold:        501->600
-        # Stench:      601->700
-        # Breeze:      701->800
-        # Whiff:       801->900
-        # Glow:        901->1000
-        # Save cell:  1001->1100
-        # Visted:     1101->1200
-        # Reliable:   1201->1300
+        # Save cell:     1 -> 100
+        # Wumpus:      101 -> 200
+        # Pit:         201 -> 300
+        # Potion Gas:  301 -> 400
+        # Heal Potion: 401 -> 500
+        # Gold:        501 -> 600
+        # Stench:      601 -> 700
+        # Breeze:      701 -> 800
+        # Whiff:       801 -> 900
+        # Glow:        901 -> 1000
+        # Save cell:  1001 -> 1100
+        # Visited:    1101 -> 1200
+        # Reliable:   1201 -> 1300
         ###
         self.getMap(file)
         
@@ -29,6 +29,7 @@ class Program:
         self.y = 0
         self.direction = 0 # 0: Up, 1: Right, 2: Down, 3: Left
         self.agentHealth = 100
+        self.numPotion = 0
         
         self.isGameOver = False
         self.isGameWin = False
@@ -77,22 +78,56 @@ class Program:
         return percept
     
     def handleAction(self, action):
-        listAction = {
-            "move forward": 1,
-            "turn left": lambda: self.getTurnResult(False),
-            "turn right": lambda: self.getTurnResult(True),
-            "grab": 0,
-            "shoot": 0,
-            "climb": 0,
-            "heal": 0
+        dictAction = {
+            "move forward": lambda: self.handleMoveForward(),
+            "turn left": lambda: self.handleTurn(False),
+            "turn right": lambda: self.handleTurn(True),
+            "grab": lambda: self.handleGrab(),
+            "shoot": lambda: self.handleShoot(),
+            "climb": lambda: self.handleClimb(),
+            "heal": lambda: self.handleHeal()
         }
         self.gameScore -= 10
         
-        temp = listAction[action]
+        temp = dictAction[action]
         return
     
-    def getTurnResult(self, isAdd = True):
+    def handleMoveForward(self):
+        coorDictNext = [[self.x, self.y - 1] if self.y != 0 else None, 
+                        [self.x + 1, self.y] if self.x != 9 else None, 
+                        [self.x, self.y + 1] if self.y != 9 else None, 
+                        [self.x - 1, self.y] if self.x != 0 else None]
+        coorXY = coorDictNext[self.direction] 
+        if coorXY is not None:
+            self.x, self.y = coorXY[0], coorXY[1]
+    
+    def handleTurn(self, isAdd = True):
         self.direction = (self.direction + 1) % 4 if isAdd else (self.direction - 1) % 4
+        
+    def handleGrab(self):
+        if self.mapHPotion[self.x][self.y] == True:
+            self.mapHPotion[self.x][self.y] = False
+            self.numPotion += 1
+            
+    def handleShoot(self):
+        self.gameScore -= 100
+        coorDictNext = [[self.x, self.y - 1] if self.y != 0 else None, 
+                        [self.x + 1, self.y] if self.x != 9 else None, 
+                        [self.x, self.y + 1] if self.y != 9 else None, 
+                        [self.x - 1, self.y] if self.x != 0 else None]
+        coorXY = coorDictNext[self.direction] 
+        if coorXY is not None and self.mapWumpus[coorXY[0], coorXY[1]] == True:
+            self.mapWumpus[coorXY[0], coorXY[1]] = False
+        return True ### Alert sound
+    
+    def handleClimb(self):
+        if self.x == 9 and self.y == 0:
+            self.isGameWin = True
+    
+    def handleHeal(self):
+        if self.numPotion > 0:
+            self.numPotion -= 1
+            self.agentHealth = (self.agentHealth + 25) % 100
     
     def printPrg(self):
         print("Gold", self.mapGold)
