@@ -22,6 +22,7 @@ class Program:
         # Save cell:  1001 -> 1100
         # Visited:    1101 -> 1200
         # Reliable:   1201 -> 1300
+        # Sound:      1301
         ###
         self.getMap(file)
         
@@ -30,6 +31,7 @@ class Program:
         self.direction = 0 # 0: Up, 1: Right, 2: Down, 3: Left
         self.agentHealth = 100
         self.numPotion = 0
+        self.isSound = False
         
         self.isGameOver = False
         self.isGameWin = False
@@ -75,9 +77,13 @@ class Program:
                 if curMap[pairCoor[0]][pairCoor[1]] == True:
                     percept.append([(index + 6) * 100 + self.x * 10 + self.y + 1])
                     
+        if self.isSound:
+            percept.append([1301])
+                    
         return percept
     
     def handleAction(self, action):
+        self.isSound = False
         dictAction = {
             "move forward": lambda: self.handleMoveForward(),
             "turn left": lambda: self.handleTurn(False),
@@ -90,7 +96,6 @@ class Program:
         self.gameScore -= 10
         
         temp = dictAction[action]
-        return
     
     def handleMoveForward(self):
         coorDictNext = [[self.x, self.y - 1] if self.y != 0 else None, 
@@ -110,7 +115,7 @@ class Program:
             self.numPotion += 1
             
     def handleShoot(self):
-        self.gameScore -= 100
+        self.gameScore -= 90
         coorDictNext = [[self.x, self.y - 1] if self.y != 0 else None, 
                         [self.x + 1, self.y] if self.x != 9 else None, 
                         [self.x, self.y + 1] if self.y != 9 else None, 
@@ -118,7 +123,7 @@ class Program:
         coorXY = coorDictNext[self.direction] 
         if coorXY is not None and self.mapWumpus[coorXY[0], coorXY[1]] == True:
             self.mapWumpus[coorXY[0], coorXY[1]] = False
-        return True ### Alert sound
+            self.isSound = True
     
     def handleClimb(self):
         if self.x == 9 and self.y == 0:
