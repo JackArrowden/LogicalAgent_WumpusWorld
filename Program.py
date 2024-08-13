@@ -93,11 +93,11 @@ class Program:
             "climb": lambda: self.handleClimb(),
             "heal": lambda: self.handleHeal()
         }
-        self.gameScore -= 10
         
         temp = dictAction[action]
     
     def handleMoveForward(self):
+        self.gameScore -= 10
         coorDictNext = [[self.x, self.y - 1] if self.y != 0 else None, 
                         [self.x + 1, self.y] if self.x != 9 else None, 
                         [self.x, self.y + 1] if self.y != 9 else None, 
@@ -105,31 +105,37 @@ class Program:
         coorXY = coorDictNext[self.direction] 
         if coorXY is not None:
             self.x, self.y = coorXY[0], coorXY[1]
+            if self.mapPGas[self.x][self.y] == True:
+                self.agentHealth = (self.agentHealth - 25) % 100
     
     def handleTurn(self, isAdd = True):
+        self.gameScore -= 10
         self.direction = (self.direction + 1) % 4 if isAdd else (self.direction - 1) % 4
         
     def handleGrab(self):
+        self.gameScore -= 10
         if self.mapHPotion[self.x][self.y] == True:
             self.mapHPotion[self.x][self.y] = False
             self.numPotion += 1
             
     def handleShoot(self):
-        self.gameScore -= 90
+        self.gameScore -= 100
         coorDictNext = [[self.x, self.y - 1] if self.y != 0 else None, 
                         [self.x + 1, self.y] if self.x != 9 else None, 
                         [self.x, self.y + 1] if self.y != 9 else None, 
                         [self.x - 1, self.y] if self.x != 0 else None]
         coorXY = coorDictNext[self.direction] 
-        if coorXY is not None and self.mapWumpus[coorXY[0], coorXY[1]] == True:
-            self.mapWumpus[coorXY[0], coorXY[1]] = False
+        if coorXY is not None and self.mapWumpus[coorXY[0]][coorXY[1]] == True:
+            self.mapWumpus[coorXY[0]][coorXY[1]] = False
             self.isSound = True
     
     def handleClimb(self):
+        self.gameScore -= 10
         if self.x == 9 and self.y == 0:
             self.isGameWin = True
     
     def handleHeal(self):
+        self.gameScore -= 10
         if self.numPotion > 0:
             self.numPotion -= 1
             self.agentHealth = (self.agentHealth + 25) % 100
@@ -141,6 +147,49 @@ class Program:
         print("Pit", self.mapPit)
         print("Wumpus", self.mapWumpus)
         
+def getAllPercepts(program):
+    result = [[[False for _ in range(4)] for _ in range(10)] for _ in range(10)]
+    mapDict = {
+        0: program.mapWumpus,
+        1: program.mapPit,
+        2: program.mapPGas,
+        3: program.mapHPotion
+    }
+        
+    for i in range(10):
+        for j in range(10):
+            for k in range(4):
+                if mapDict[k][i][j]:
+                    if i != 9:
+                        result[i + 1][j][k] = True
+                    if i != 0:
+                        result[i - 1][j][k] = True
+                    if j != 9:
+                        result[i][j + 1][k] = True
+                    if j != 0:
+                        result[i][j - 1][k] = True
+                
+    return result
+
+def getAllElements(program):
+    result = [[[False for _ in range(5)] for _ in range(10)] for _ in range(10)]
+    mapDict = {
+        0: program.mapWumpus,
+        1: program.mapPit,
+        2: program.mapPGas,
+        3: program.mapHPotion,
+        4: program.mapGold
+    }
+        
+    for i in range(10):
+        for j in range(10):
+            for k in range(5):
+                result[i][j][k] = mapDict[k][i][j]
+                
+    return result
+        
 if __name__ == "__main__":
     ABC = Program('test.txt')
-    print(ABC.getPercept())
+    # print(ABC.getPercept())
+    # print(getAllPercepts(ABC))
+    print(getAllElements(ABC))
