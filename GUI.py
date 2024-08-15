@@ -36,7 +36,8 @@ class SystemGUI():
         # self.frame5 = tk.Frame(self.root)
         
         self.resetBtn = [True, True, True]
-        
+        self.images= []
+
         self.listColorSs = [["#0B77A0", "#074761"], ["#0D8B9C", "#085660"], 
                             ["#109994", "#0D7D78"], ["#11A28C", "#0D8170"], 
                             ["#12AD7F", "#0D795A"], ["#14B66E", "#12A261"], 
@@ -148,13 +149,15 @@ class SystemGUI():
                 y2 = y1 + cell_size
                 canvas.create_rectangle(x1, y1, x2, y2, fill="white", outline="black")
 
-    def add_image(self,canvas, cell_size, image_path, row, col):
+    def add_image(self,canvas, image_path, row, col, image_size=65, x=0, y=0 ):
         image = Image.open(image_path)
-        image = image.resize((cell_size, cell_size), Image.Resampling.LANCZOS)
-        photo = ImageTk.PhotoImage(image)
+        image = image.resize((image_size, image_size), Image.Resampling.LANCZOS)
         
-        x = col * cell_size
-        y = row * cell_size
+        photo = ImageTk.PhotoImage(image)
+        self.images.append(photo)  
+
+        x = col * self.cell_size + x
+        y = row * self.cell_size + y
         canvas.create_image(x, y, anchor='nw', image=photo)
         canvas.image = photo
 
@@ -172,13 +175,14 @@ class SystemGUI():
         # Draw the circle
         canvas.create_oval(x1, y1, x2, y2, fill=color, outline=color)
     
-    def drawElements(self,canvas,mapElement):
-        
+    def drawElements(self, canvas, mapElement):
+        filePath = ["wumpus.jnp", "pit.jnp", "gas.jnp","HPotion.jnp", "gold.jpn"]
+
             
         return
     
     def drawPerceps(self, canvas, mapPerceps):  
-        color = ["#8EE5EE","#3CB371","#8E388E","#FFF68F"] # breeze, stench, whiff, glow 
+        color = ["#3CB371","#8EE5EE","#8E388E","#FFF68F"] #  stench, breeze,whiff, glow 
         for i in range(10):
             for j in range(10):
                 N = 10
@@ -188,15 +192,14 @@ class SystemGUI():
                     N +=15
         return
     
-    
     def showFrame2(self):
         self.unshowAllFrames()
         self.frame2.pack(expand=True, fill=tk.BOTH) 
         self.clearFrame(self.frame2)
         
         A = [
-            [[True, False, True , True], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
-            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
+            [[True, True, True , True], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
+            [[False,False, False, False], [True,True, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
             [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
             [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
             [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
@@ -226,13 +229,14 @@ class SystemGUI():
 
         self.create_grid(canvas, self.row, self.col, self.cell_size)
         self.drawPerceps(canvas, A)
-        # self.add_image(canvas, cell_size, "asd.jpg", 2, 2)
-
-        # self.draw_dot(canvas, 2, 2,"red", radius=4.5, m= 7.5)
-        # self.draw_dot(canvas, 2, 2,"blue", radius=4.5, m=7.5, n=25)
-        # self.draw_dot(canvas, 2, 2,"gray", radius=4.5, m=7.5, n=40)
-        # self.draw_dot(canvas, 2, 2,"black", radius=4.5, m=7.5, n=55)
-
+        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 16, 2)
+        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 42, 2)
+        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 16, 2+20)
+        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 42, 2+20)
+        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 16, 2+40)
+        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 42, 2+40)
+        # self.drawElements(canvas, B)
+        
         self.subFrame2b = tk.Frame(self.frame2, bg="lightblue")
 
         self.subFrame2b.pack(side=tk.RIGHT, expand=True, anchor='nw', padx=(0, 300), pady=(30, 0))
