@@ -158,63 +158,88 @@ class SystemGUI():
         canvas.create_image(x, y, anchor='nw', image=photo)
         canvas.image = photo
 
+
+    def draw_dot(self, canvas, row, col, color="red", radius=10, m = 10, n=10):
+        x = col * self.cell_size + m
+        y = row * self.cell_size + n
+
+        # Calculate the coordinates for the circle
+        x1 = x - radius
+        y1 = y - radius
+        x2 = x + radius
+        y2 = y + radius
+
+        # Draw the circle
+        canvas.create_oval(x1, y1, x2, y2, fill=color, outline=color)
+    
+    def drawElements(self,canvas,mapElement):
+        
+            
+        return
+    
+    def drawPerceps(self, canvas, mapPerceps):  
+        color = ["#8EE5EE","#3CB371","#8E388E","#FFF68F"] # breeze, stench, whiff, glow 
+        for i in range(10):
+            for j in range(10):
+                N = 10
+                for k in range(4):
+                    if mapPerceps[i][j][k]:
+                        self.draw_dot(canvas,i,j,color[k],radius = 4.5, m = 9,n=N)
+                    N +=15
+        return
+    
+    
     def showFrame2(self):
         self.unshowAllFrames()
         self.frame2.pack(expand=True, fill=tk.BOTH) 
-        self.clearFrame(self.frame2) 
+        self.clearFrame(self.frame2)
+        
+        A = [
+            [[True, False, True , True], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
+            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
+            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
+            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
+            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
+            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
+            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
+            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
+            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
+            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]]
+        ]
 
         self.col = 10
         self.row = 10
+        self.cell_size = 65
 
-        cell_size = 65
-        canvas_width = cell_size * self.col
-        canvas_height = cell_size * self.row
+        # Add the greeting label at the top-left of the frame
 
-        canvas = tk.Canvas(root, width=canvas_width, height=canvas_height)
-        canvas.place(x = 20, y = 20)     
+        # Create subFrame2a and subFrame2b to split the frame2
+        self.subFrame2a = tk.Frame(self.frame2, bg="lightgrey")
+        self.subFrame2a.pack(side=tk.LEFT, expand=True)
 
-        self.create_grid(canvas, self.row, self.col, cell_size)
-        self.add_image(canvas, cell_size, "asd.jpg", 2, 2)
+        # cell_size = 50
+        canvas_width = self.cell_size * self.col
+        canvas_height = self.cell_size * self.row
 
+        canvas = tk.Canvas(self.subFrame2a, width=canvas_width, height=canvas_height)
+        canvas.pack(expand=True)
 
-        greeting = tk.Label(root, text="Path")
-        greeting.place(x = 700, y=0)
+        self.create_grid(canvas, self.row, self.col, self.cell_size)
+        self.drawPerceps(canvas, A)
+        # self.add_image(canvas, cell_size, "asd.jpg", 2, 2)
+
+        # self.draw_dot(canvas, 2, 2,"red", radius=4.5, m= 7.5)
+        # self.draw_dot(canvas, 2, 2,"blue", radius=4.5, m=7.5, n=25)
+        # self.draw_dot(canvas, 2, 2,"gray", radius=4.5, m=7.5, n=40)
+        # self.draw_dot(canvas, 2, 2,"black", radius=4.5, m=7.5, n=55)
+
+        self.subFrame2b = tk.Frame(self.frame2, bg="lightblue")
+
+        self.subFrame2b.pack(side=tk.RIGHT, expand=True, anchor='nw', padx=(0, 300), pady=(30, 0))
+        greeting = tk.Label(self.subFrame2b, text="Path")
+        greeting.pack(padx=10, pady=10)
 
         return
-
-    # def showFrame2(self):
-    #     self.unshowAllFrames()
-    #     self.frame2.pack(expand=True, anchor='nw') 
-    #     self.clearFrame(self.frame2) 
-
-    #     self.col = 10
-    #     self.row = 10
-    #     cell_size = 65
-
-
-    #     self.subFrame2a = tk.Frame(self.frame2, width = 700, height=700)
-    #     self.subFrame2a.pack(side="left", pady=(5, 40)) 
-
-
-    #     canvas_width = cell_size * self.col
-    #     canvas_height = cell_size * self.row
-
-    #     canvas = tk.Canvas(self.subFrame2a, width=canvas_width, height=canvas_height)
-    #     canvas.pack(padx=40, pady=(25, 5))     
-
-
-    #     self.create_grid(canvas, self.row, self.col, cell_size)
-    #     self.add_image(canvas, cell_size, "asd.jpg", 2, 2)
-
-    #     self.subFrame2b = tk.Frame(self.frame2)
-    #     self.subFrame2b.pack(side ="right", anchor='nw')
-
-    #     greeting = tk.Label(self.subFrame2b, text="Path")
-    #     greeting.pack(anchor='nw', padx=10, pady=10)
-
-    #     return
-
-
 
     def exit(self):
         try:
