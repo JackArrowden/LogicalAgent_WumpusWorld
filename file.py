@@ -1,3 +1,10 @@
+def checkOpenFile(file):
+    try:
+        with open(file, 'r') as cur:
+            return True
+    except:
+        return False
+    
 def readF(file):
     try:
         caveMap = []

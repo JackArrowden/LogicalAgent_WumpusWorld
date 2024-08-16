@@ -1,13 +1,7 @@
 import tkinter as tk
 import file
+from Program import *
 from PIL import Image, ImageTk
-
-def checkOpenFile(file):
-    try:
-        with open(file, 'r') as cur:
-            return True
-    except:
-        return False
 
 class SystemGUI():
     def __init__(self, root):
@@ -21,46 +15,37 @@ class SystemGUI():
         self.default_text = "Enter input file..."
         self.text1 = "The file's name must not be left blank!"
         self.text2 = "An error occur while opening input file\nPlease enter another file's name..."
-        # self.root.protocol("WM_DELETE_WINDOW", self.exit)    
+        # self.root.protocol("WM_DELETE_WINDOW", self.exit)
+            
         self.width = 0
         self.height = 0
-        self.edge = 0
-            
-        self.fileName = ""
+        self.row = 10 
+        self.col = 10
+        self.cell_size = 65
 
+        self.fileName = ""
+        self.idAfter = set()
+        self.map = [[0]]
+        self.isSolvable = True
         
+        self.isHead = True
+        self.isTail = False
+        self.isResetList = True
+        
+        self.curNumState = 0
+        self.listCells = [[(0, 1), 'move forward', 0]]
+        self.listRemainCells = [[(1, 1), 'move forward', 0], [(1, 2), 'turn right', 1], [(1, 2), 'shoot', 1]]
+
         self.frame1 = tk.Frame(self.root)
         self.frame2 = tk.Frame(self.root)
-        # self.frame3 = tk.Frame(self.root)
+        self.frame3 = tk.Frame(self.root)
         # self.frame4 = tk.Frame(self.root)
         # self.frame5 = tk.Frame(self.root)
         
-        self.resetBtn = [True, True, True]
+        self.autoRunTime = [1, {1: 1000, 2: 600, 3: 400, 4: 200, 5: 100}]
         self.images= []
-
-        self.listColorSs = [["#0B77A0", "#074761"], ["#0D8B9C", "#085660"], 
-                            ["#109994", "#0D7D78"], ["#11A28C", "#0D8170"], 
-                            ["#12AD7F", "#0D795A"], ["#14B66E", "#12A261"], 
-                            ["#14BD5C", "#0F8F46"], ["#15C247", "#109235"], 
-                            ["#15C62E", "#12A627"], ["#16C80D", "#11980A"]]
-        self.listColorCurSs = [["#09B354", "black"], ["#30BE66", "black"],
-                               ["#47C570", "black"], ["#5FCC7B", "black"],
-                               ["#78D387", "black"], ["#89D88E", "black"],
-                               ["#99DD96", "black"], ["#A7E19C", "black"],
-                               ["#AFE4A0", "black"], ["#B4E5A2", "black"]]
-        self.listColorGs = [["#E83E2A", "#BC2414"], ["#ED5F36", "#C43812"],
-                            ["#F0743E", "#EC5512"], ["#F38544", "#F06A18"],
-                            ["#F59449", "#E1680D"], ["#F7A34F", "#E4770A"],
-                            ["#F9B053", "#EE8B08"], ["#FBB957", "#E48A06"],
-                            ["#FCBF59", "#FBA00D"], ["#FCC25A", "#F6A004"]]
-        self.listColorFs = [["#F3F595", "black"], ["#F6F791", "black"], 
-                            ["#F7F98B", "black"], ["#F9FA81", "black"], 
-                            ["#FBFB75", "black"], ["#FCFD64", "black"], 
-                            ["#FDFD54", "black"], ["#FEFE3B", "black"], 
-                            ["#FFFF27", "black"], ["#FFFF10", "black"]]
-        self.listColorLines = ["#FF0000", "#00B050", "#163E64", "#78206E", "#3A3A3A", "#0070C0", "#FFC000", "#C00000", "#7030A0", "#7F7F7F"]
         
-        self.showFrame2()
+        self.showFrame1()
 
     def mainFrame(self): #### Frame 1  
         ## Input frame
@@ -108,7 +93,7 @@ class SystemGUI():
             self.entry.delete("1.0", tk.END)
             self.entry.insert("1.0", self.text1)
             self.entry.mark_set("insert", "1.0")
-        elif checkOpenFile(self.fileName) == False:
+        elif file.checkOpenFile(self.fileName) == False:
             self.entry.delete("1.0", tk.END)
             self.entry.insert("1.0", self.text2)  
             self.entry.mark_set("insert", "1.0")
@@ -116,6 +101,10 @@ class SystemGUI():
             resultRead = file.readF(self.fileName)
             self.col = len(resultRead[0])
             self.row = len(resultRead)
+            # self.mapPercepts = Program.getAllPercepts
+            program = Program("test.txt")
+            self.mapPercepts = getAllPercepts(program)
+            self.mapElements = getAllElements(program)
             self.showFrame2()
     
     def clearFrame(self, frame):
@@ -128,7 +117,7 @@ class SystemGUI():
     def unshowAllFrames(self):
         self.frame1.pack_forget()
         self.frame2.pack_forget()
-        # self.frame3.pack_forget()
+        self.frame3.pack_forget()
         # self.frame4.pack_forget()
         # self.frame5.pack_forget()
 
@@ -149,6 +138,17 @@ class SystemGUI():
                 y2 = y1 + cell_size
                 canvas.create_rectangle(x1, y1, x2, y2, fill="white", outline="black")
 
+        for cell in self.listCells:
+            canvas.create_rectangle(cell[0][0]*cell_size, cell[0][1]*cell_size, (cell[0][0]+1)*cell_size, (cell[0][1]+1)*cell_size, fill="#BBBBBB", outline="black")
+
+        hht = rows * cell_size
+        wth = cols * cell_size
+
+        canvas.create_line([(2, 0), (2, hht)], fill='black')
+        canvas.create_line([(wth, 0), (wth, hht)], fill='black')
+        canvas.create_line([(0, 2), (wth, 2)], fill='black')
+        canvas.create_line([(0, hht), (wth, hht)], fill='black')
+
     def add_image(self,canvas, image_path, row, col, image_size=65, x=0, y=0 ):
         image = Image.open(image_path)
         image = image.resize((image_size, image_size), Image.Resampling.LANCZOS)
@@ -160,7 +160,6 @@ class SystemGUI():
         y = row * self.cell_size + y
         canvas.create_image(x, y, anchor='nw', image=photo)
         canvas.image = photo
-
 
     def draw_dot(self, canvas, row, col, color="red", radius=10, m = 10, n=10):
         x = col * self.cell_size + m
@@ -175,75 +174,237 @@ class SystemGUI():
         # Draw the circle
         canvas.create_oval(x1, y1, x2, y2, fill=color, outline=color)
     
-    def drawElements(self, canvas, mapElement):
-        filePath = ["wumpus.jnp", "pit.jnp", "gas.jnp","HPotion.jnp", "gold.jpn"]
-
-            
-        return
+    def drawElements(self, canvas):
+        # filePath = ["test/wumpus.jpg", "test/pit.jpg", "test/poisonGas.jpg","test/healing.jpg", "test/gold.jpg"]
+        filePath = ["wumpus.png", "test/2.png", "test/3.png", "test/4.png", "test/5.png"]
+        for i in range(10):
+            for j in range(10):
+                for k in range(5):
+                    if self.mapElements[i][j][k]:
+                        self.add_image(canvas, filePath[k], i, j, 20, 19 + (22 if k%2 else 0), 4 +(20* int(k/2)) )
     
-    def drawPerceps(self, canvas, mapPerceps):  
+    def drawPercepts(self, canvas):  
         color = ["#3CB371","#8EE5EE","#8E388E","#FFF68F"] #  stench, breeze,whiff, glow 
         for i in range(10):
             for j in range(10):
                 N = 10
                 for k in range(4):
-                    if mapPerceps[i][j][k]:
-                        self.draw_dot(canvas,i,j,color[k],radius = 4.5, m = 9,n=N)
+                    if self.mapPercepts[i][j][k]:
+                        self.draw_dot(canvas, i, j, color[k], radius = 4.5, m = 9, n=N)
                     N +=15
-        return
     
-    def showFrame2(self):
-        self.unshowAllFrames()
-        self.frame2.pack(expand=True, fill=tk.BOTH) 
-        self.clearFrame(self.frame2)
-        
-        A = [
-            [[True, True, True , True], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
-            [[False,False, False, False], [True,True, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
-            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
-            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
-            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
-            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
-            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
-            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
-            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]],
-            [[False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False], [False,False, False, False]]
-        ]
-
-        self.col = 10
-        self.row = 10
-        self.cell_size = 65
-
-        # Add the greeting label at the top-left of the frame
-
-        # Create subFrame2a and subFrame2b to split the frame2
-        self.subFrame2a = tk.Frame(self.frame2, bg="lightgrey")
-        self.subFrame2a.pack(side=tk.LEFT, expand=True)
-
-        # cell_size = 50
-        canvas_width = self.cell_size * self.col
-        canvas_height = self.cell_size * self.row
-
-        canvas = tk.Canvas(self.subFrame2a, width=canvas_width, height=canvas_height)
-        canvas.pack(expand=True)
-
+    def draw_map(self, canvas):
         self.create_grid(canvas, self.row, self.col, self.cell_size)
-        self.drawPerceps(canvas, A)
-        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 16, 2)
-        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 42, 2)
-        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 16, 2+20)
-        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 42, 2+20)
-        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 16, 2+40)
-        self.add_image(canvas, "wumpus.png", 0 , 0, 21, 42, 2+40)
-        # self.drawElements(canvas, B)
+        self.drawPercepts(canvas)
+        self.drawElements(canvas)
+        curPos = self.listCells[len(self.listCells)-1]
+        self.add_image(canvas, "asd.jpg", curPos[0][1], curPos[0][0], 18, 41, 44)
+
+    def chooseViewFrame(self):
+        self.subFrame2a = tk.Frame(self.frame2)
+        self.subFrame2a.pack(expand=True, anchor='center', pady = (0, 80)) 
+
+        ## Step by step manually
+        self.stepByStepManuBtn = tk.Button(self.subFrame2a, text = "Show step by step manually", command = self.showFrame3, bg = "#323232", fg = "#FAFAFA", width = 40, height = 2, cursor = "hand2")
+        self.stepByStepManuBtn.pack(pady = (10, 10))
         
-        self.subFrame2b = tk.Frame(self.frame2, bg="lightblue")
+        ## Step by step automatically
+        self.stepByStepAutoBtn = tk.Button(self.subFrame2a, text = "Show step by step automatically", command = lambda: self.showFrame3(True), bg = "#323232", fg = "#FAFAFA", width = 40, height = 2, cursor = "hand2")
+        self.stepByStepAutoBtn.pack(pady = (10, 10))
 
-        self.subFrame2b.pack(side=tk.RIGHT, expand=True, anchor='nw', padx=(0, 300), pady=(30, 0))
-        greeting = tk.Label(self.subFrame2b, text="Path")
-        greeting.pack(padx=10, pady=10)
+    def moveContent(self, listA, listB):
+        while listA:
+            cur = listA.pop()
+            listB.insert(0, cur)
+            
+    def moveContentRev(self, listA, listB):
+        while listA:
+            cur = listA.pop(0)
+            listB.append(cur)
+    
+    def move2DContent(self, listA, listB):
+        listLen = len(listA)
+        for index in range(listLen):
+            self.moveContent(listA[index], listB[index])
 
-        return
+    def showFrame2(self):
+        for after_id in self.idAfter:
+            self.root.after_cancel(after_id)
+        self.idAfter.clear()
+        
+        self.isResetList = True
+        self.isHead = True
+        self.isTail = False
+        self.unshowAllFrames()
+        self.root.title("Choose view frame")
+        self.frame2.pack(expand=True, anchor='center')  
+        self.clearFrame(self.frame2) 
+        # self.move2DContent(self.listCells, self.listRemainCells)
+        self.chooseViewFrame()
+
+    def showFrame3(self, isAuto = False):
+        self.unshowAllFrames()
+        self.root.title("Step by step")
+        self.frame3.pack(expand=True, anchor='center')
+        self.clearFrame(self.frame3)  
+        self.curNumState = 0
+        self.stepByStepFrame(isAuto)
+
+    def stepByStepFrame(self, isAuto): #### Frame 3        
+        # if self.isResetList:
+        #     self.isResetList = False
+        #     self.move2DContent(self.listCells, self.listRemainCells)
+        #     # self.move1Item(self.listRemainCells, self.listCells)
+
+        self.width = self.cell_size * self.col
+        self.height = self.cell_size * self.row
+        self.edge = self.cell_size
+        self.curTxtID = 0
+        
+        ### Sub frame 3 a
+        self.subFrame3a = tk.Frame(self.frame3)
+        self.subFrame3a.pack(expand=True, anchor='center', pady = (5, 15))  
+        
+        ## Sub frame 3 a1
+        self.subFrame3a1 = tk.Frame(self.subFrame3a, width = 200)
+        self.subFrame3a1.pack(side = tk.LEFT, expand=False, anchor='center', pady = (5, 5))  
+        
+        self.backBtn3a1 = tk.Button(self.subFrame3a1, text = "Back", command = self.showFrame2, bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
+        self.backBtn3a1.pack(side = tk.LEFT, pady = (5, 0), padx = (0, 50))
+        
+        ## Cur state
+        curStep = "Iteration: " + str(self.curNumState)
+        self.curState = tk.Canvas(self.subFrame3a, bg = "#F0F0F0", width = 200, height = 30)
+   
+        self.curState.pack(side = tk.LEFT, expand=True, anchor='center', pady = (20, 0), padx = (50, 50))     
+        self.curState.create_text(100, 10, text = curStep, fill = "black", font = self.font2)
+        
+        ## Sub frame 3 a2
+        self.subFrame3a2 = tk.Frame(self.subFrame3a, width = 200)
+        self.subFrame3a2.pack(side = tk.LEFT, expand=False, anchor='center', pady = (5, 5)) 
+        
+        self.exitBtn3 = tk.Button(self.subFrame3a2, text = "Exit", command = self.exit, bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
+        self.exitBtn3.pack(side = tk.LEFT, pady = (5, 0), padx = (50, 0))
+        
+        ### Sub frame 3 b
+        self.subFrame3b = tk.Canvas(self.frame3, bg = "white", width = self.width, height = self.height)
+        self.subFrame3b.pack(expand=True, anchor='center', pady = (10, 10))  
+        
+        self.draw_map(self.subFrame3b)
+        
+        ### Sub frame 3 c
+        self.subFrame3c = tk.Frame(self.frame3)
+        self.subFrame3c.pack(expand=True, anchor='center', pady = (15, 10))  
+        
+        if not isAuto:
+            self.prevBtn1 = tk.Button(self.subFrame3c, state = "disabled", text = "Previous", bg = "lightgray", fg = "white", width = 25, height = 2)
+            self.prevBtn2 = tk.Button(self.subFrame3c, text = "Previous", command = lambda: self.prevMap(kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.curState]), bg = "#323232", fg = "#FAFAFA", width = 25, height = 2, cursor = "hand2")
+            self.prevBtn1.pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))
+                
+            self.nextBtn1 = tk.Button(self.subFrame3c, state = "disabled", text = "Next", bg = "lightgray", fg = "white", width = 25, height = 2)
+            self.nextBtn2 = tk.Button(self.subFrame3c, text = "Next", command = lambda: self.nextMap(isAuto = False, kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.curState]), bg = "#323232", fg = "#FAFAFA", width = 25, height = 2, cursor = "hand2")
+            self.nextBtn2.pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))
+        else:
+            self.slowDown1 = tk.Button(self.subFrame3c, text = "Slow down", command = lambda: self.slowDownFunc(kwargs = [self.slowDown1, self.slowDown2, self.speedUp1, self.speedUp2]), bg = "#323232", fg = "#FAFAFA", width = 25, height = 2, cursor = "hand2")
+            self.slowDown2 = tk.Button(self.subFrame3c, state = "disabled", text = "Slow down", bg = "lightgray", fg = "white", width = 25, height = 2)
+            if self.autoRunTime[0] == 1:
+                self.slowDown2.pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))  
+            else:
+                self.slowDown1.pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))  
+            
+            self.speedUp1 = tk.Button(self.subFrame3c, text = "Speed up", command = lambda: self.speedUpFunc(kwargs = [self.slowDown1, self.slowDown2, self.speedUp1, self.speedUp2]), bg = "#323232", fg = "#FAFAFA", width = 25, height = 2, cursor = "hand2")
+            self.speedUp2 = tk.Button(self.subFrame3c, state = "disabled", text = "Speed up", bg = "lightgray", fg = "white", width = 25, height = 2)
+            if self.autoRunTime[0] != len(self.autoRunTime[1]):
+                self.speedUp1.pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))  
+            else:
+                self.speedUp2.pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))  
+            
+        if isAuto:
+            curID = self.root.after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = [self.subFrame3b, self.subFrame3c, self.curState]))
+            self.idAfter.add(curID)
+
+    def prevMap(self, kwargs = []):
+        self.curNumState = self.curNumState - 1
+        curStep = "Iteration: " + str(self.curNumState)
+        self.clearCanvas(kwargs[5])
+        kwargs[5].create_text(100, 10, text = curStep, fill = "black", font = self.font2)
+            
+        cur = (0, 0)
+            
+        if len(self.listCells) >= 2:
+            cur = self.listCells.pop()
+            self.listRemainCells.insert(0, cur)
+            
+        self.clearCanvas(kwargs[0])
+        self.draw_map(kwargs[0])
+        
+        if len(self.listCells) <= 1:
+            kwargs[1].pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))
+            kwargs[2].pack_forget()
+        if not len(self.listRemainCells) == 0:
+            kwargs[3].pack_forget()
+            kwargs[4].pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))
+            
+    def nextMap(self, isAuto = False, kwargs = []):
+        self.curNumState = self.curNumState + 1
+        curStep = "Iteration: " + str(self.curNumState)
+        if isAuto:
+            self.clearCanvas(kwargs[2])
+            kwargs[2].create_text(100, 10, text = curStep, fill = "black", font = self.font2)
+        else:
+            self.clearCanvas(kwargs[5])
+            kwargs[5].create_text(100, 10, text = curStep, fill = "black", font = self.font2)
+        
+        # cur = (0, 0)
+        if len(self.listRemainCells) > 0:
+            cur = self.listRemainCells.pop(0)
+            self.listCells.append(cur)
+            
+        self.clearCanvas(kwargs[0])
+        self.draw_map(kwargs[0])
+            
+        if not isAuto:
+            if not len(self.listCells) == 0:
+                kwargs[1].pack_forget()
+                kwargs[2].pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))
+           
+            if len(self.listRemainCells) == 0:
+                kwargs[4].pack_forget()
+                kwargs[3].pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))
+        else:
+            if len(self.listRemainCells) != 0:
+                temp = kwargs
+                curid = kwargs[1].after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = temp))
+                self.idAfter.add(curid)
+  
+    def clearCanvas(self, canvas):
+        for item in canvas.find_all():
+            canvas.delete(item)
+
+    def move1Item(self, listA, listB):
+        listLen = len(listA)
+        for i in range(listLen):
+            listB[i].append(listA[i].pop(0))
+    
+    def slowDownFunc(self, kwargs = []):
+        if self.autoRunTime[0] > 1:
+            self.autoRunTime[0] = self.autoRunTime[0] - 1
+        if self.autoRunTime[0] == 1:
+            kwargs[0].pack_forget()
+            kwargs[1].pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))  
+        if self.autoRunTime[0] != len(self.autoRunTime[1]):
+            kwargs[3].pack_forget()
+            kwargs[2].pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))  
+    
+    def speedUpFunc(self, kwargs = []):
+        if self.autoRunTime[0] < len(self.autoRunTime[1]):
+            self.autoRunTime[0] = self.autoRunTime[0] + 1
+        if self.autoRunTime[0] != 1:
+            kwargs[1].pack_forget()
+            kwargs[0].pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))  
+        if self.autoRunTime[0] == len(self.autoRunTime[1]):
+            kwargs[2].pack_forget()
+            kwargs[3].pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))  
 
     def exit(self):
         try:
@@ -254,8 +415,6 @@ class SystemGUI():
             except:
                 pass
     
-
-
 if __name__ == "__main__":
     root = tk.Tk()
     app = SystemGUI(root)
