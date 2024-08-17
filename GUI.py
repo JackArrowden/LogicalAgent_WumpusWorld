@@ -34,8 +34,8 @@ class SystemGUI():
         self.isResetList = True
         
         self.curNumState = 0
-        self.listCells = [[(0, 1), 'move forward', 0]]
-        self.listRemainCells = [[(1, 1), 'move forward', 0], [(1, 2), 'turn right', 1], [(1, 2), 'shoot', 1]]
+        self.listCells = []
+        self.listRemainCells = [[(0, 1), 'move forward', 0], [(1, 1), 'move forward', 0], [(1, 2), 'turn right', 1], [(1, 2), 'shoot', 1]]
 
         self.frame1 = tk.Frame(self.root)
         self.frame2 = tk.Frame(self.root)
@@ -263,6 +263,10 @@ class SystemGUI():
         self.unshowAllFrames()
         self.root.title("Step by step")
         self.frame3.pack(expand=True, anchor='center')
+        
+        self.moveContent(self.listCells, self.listRemainCells)
+        self.move1Item(self.listRemainCells, self.listCells)
+        
         self.clearFrame(self.frame3)  
         self.curNumState = 0
         self.stepByStepFrame(isAuto)
@@ -479,9 +483,7 @@ class SystemGUI():
             canvas.delete(item)
 
     def move1Item(self, listA, listB):
-        listLen = len(listA)
-        for i in range(listLen):
-            listB[i].append(listA[i].pop(0))
+        listB.append(listA.pop(0))
     
     def slowDownFunc(self, kwargs = []):
         if self.autoRunTime[0] > 1:
