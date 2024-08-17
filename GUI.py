@@ -23,6 +23,7 @@ class SystemGUI():
         self.row = 10 
         self.col = 10
         self.cell_size = 65
+        self.HP = 100
 
         self.fileName = ""
         self.idAfter = set()
@@ -204,6 +205,23 @@ class SystemGUI():
         self.drawElements(canvas)
         curPos = self.listCells[len(self.listCells)-1]
         self.add_image(canvas, "asd.jpg", curPos[0][1], curPos[0][0], 18, 41, 44)
+
+    def draw_HP(self, canvas, x, y, size, HP = 100, width = 10):
+        len = float(size / 100)
+        color = ""
+        if HP >75: color = "green"
+        elif HP >50: color = "yellow"
+        elif HP >25: color ="orange" 
+        else: color ="red"  
+
+        canvas.create_line(x, y, x + len * HP, y, fill=color, width=10)
+
+        for i in range (1,5):
+            x1 = x - 1
+            x2 = x + 25*i *len
+            y1 = y - width/2
+            y2 = y + width/2
+            canvas.create_rectangle(x1, y1, x2, y2, fill="", outline="black")
 
     def chooseViewFrame(self):
         self.subFrame2a = tk.Frame(self.frame2)
