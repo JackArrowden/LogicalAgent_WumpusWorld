@@ -35,7 +35,7 @@ class SystemGUI():
         
         self.curNumState = 0
         self.listCells = []
-        self.listRemainCells = [[(0, 1), 'move forward', 0], [(1, 1), 'move forward', 0], [(1, 2), 'turn right', 1], [(1, 2), 'shoot', 1]]
+        self.listRemainCells = [[(0, 1), 'move forward', 0], [(1, 1), 'move forward', 1], [(1, 2), 'turn right', 2], [(1, 2), 'shoot', 3]]
 
         self.frame1 = tk.Frame(self.root)
         self.frame2 = tk.Frame(self.root)
@@ -302,11 +302,11 @@ class SystemGUI():
         
         if not isAuto:
             self.prevBtn1 = tk.Button(self.subFrame3a, state = "disabled", text = "Previous", bg = "lightgray", fg = "white", width = 20, height = 2)
-            self.prevBtn2 = tk.Button(self.subFrame3a, text = "Previous", command = lambda: self.prevMap(kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.subFrame3c1]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
+            self.prevBtn2 = tk.Button(self.subFrame3a, text = "Previous", command = lambda: self.prevMap(kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.subFrame3c1, self.subFrame3c2]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
             self.prevBtn1.pack(pady = (5, 5)) 
                 
             self.nextBtn1 = tk.Button(self.subFrame3a, state = "disabled", text = "Next", bg = "lightgray", fg = "white", width = 20, height = 2)
-            self.nextBtn2 = tk.Button(self.subFrame3a, text = "Next", command = lambda: self.nextMap(isAuto = False, kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.subFrame3c1]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
+            self.nextBtn2 = tk.Button(self.subFrame3a, text = "Next", command = lambda: self.nextMap(isAuto = False, kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.subFrame3c1, self.subFrame3c2]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
             self.nextBtn2.pack(pady = (5, 5))
         else:
             self.slowDown1 = tk.Button(self.subFrame3a, text = "Slow down", command = lambda: self.slowDownFunc(kwargs = [self.slowDown1, self.slowDown2, self.speedUp1, self.speedUp2]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
@@ -411,6 +411,18 @@ class SystemGUI():
         self.subFrame3c2.create_text(20, 250,  text='T', font=("Arial", 15), fill="Red")
         self.subFrame3c2.create_text(100, 250, text = objA, fill = "black", font = self.font3)
 
+        # 0: Up, 1: Right, 2: Down, 3: Left
+        direction = self.listCells[len(self.listCells)-1][2]
+        if direction == 0:
+            self.subFrame3c2.create_text(100, 330, text="^", font=("Arial", 48), fill="blue")
+        elif direction == 1:
+            self.subFrame3c2.create_text(100, 320, text=">", font=("Arial", 40), fill="blue")        
+        elif direction == 2:
+            self.subFrame3c2.create_text(100, 320, text="v", font=("Arial", 36), fill="blue")
+        elif direction == 3:
+            self.subFrame3c2.create_text(100, 320, text="<", font=("Arial", 40), fill="blue")
+
+
         if isAuto:
             curID = self.root.after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = [self.subFrame3b, self.subFrame3a, self.subFrame3c1]))
             self.idAfter.add(curID)
@@ -429,7 +441,19 @@ class SystemGUI():
             
         self.clearCanvas(kwargs[0])
         self.draw_map(kwargs[0])
-        
+
+        self.subFrame3c2.create_rectangle(80, 290, 120, 340, fill="white", outline="white")
+        # 0: Up, 1: Right, 2: Down, 3: Left
+        direction = self.listCells[len(self.listCells)-1][2]
+        if direction == 0:
+            self.subFrame3c2.create_text(100, 330, text="^", font=("Arial", 48), fill="blue")
+        elif direction == 1:
+            self.subFrame3c2.create_text(100, 320, text=">", font=("Arial", 40), fill="blue")        
+        elif direction == 2:
+            self.subFrame3c2.create_text(100, 320, text="v", font=("Arial", 36), fill="blue")
+        elif direction == 3:
+            self.subFrame3c2.create_text(100, 320, text="<", font=("Arial", 40), fill="blue")
+
         if len(self.listCells) <= 1:
             kwargs[1].pack(pady = (5, 5))
             kwargs[2].pack_forget()
@@ -459,7 +483,19 @@ class SystemGUI():
             
         self.clearCanvas(kwargs[0])
         self.draw_map(kwargs[0])
-            
+        
+        self.subFrame3c2.create_rectangle(80, 290, 120, 340, fill="white", outline="white")
+        # 0: Up, 1: Right, 2: Down, 3: Left
+        direction = self.listCells[len(self.listCells)-1][2]
+        if direction == 0:
+            self.subFrame3c2.create_text(100, 330, text="^", font=("Arial", 48), fill="blue")
+        elif direction == 1:
+            self.subFrame3c2.create_text(100, 320, text=">", font=("Arial", 40), fill="blue")        
+        elif direction == 2:
+            self.subFrame3c2.create_text(100, 320, text="v", font=("Arial", 36), fill="blue")
+        elif direction == 3:
+            self.subFrame3c2.create_text(100, 320, text="<", font=("Arial", 40), fill="blue")
+
         if not isAuto:
             if not len(self.listCells) == 0:
                 kwargs[1].pack_forget()
