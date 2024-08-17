@@ -1,4 +1,4 @@
-from clause import *
+from method import *
 import copy
 
 class KnowledgeBase:
@@ -31,6 +31,13 @@ class KnowledgeBase:
             self.KB.remove(clause)
             return True
         return False
+    
+    def update_unit_clause(self, clause):
+        if len(clause) != 1:
+            return False
+        self.del_clause([-clause[0]])
+        self.add_clause(clause)
+        return True
 
     def resolution(self, alpha):
         """
@@ -65,4 +72,3 @@ class KnowledgeBase:
             if new_clauses.issubset(prev_clauses):
                 return False
             cur_clauses = new_clauses
-

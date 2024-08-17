@@ -200,35 +200,6 @@ def getAllElements(program):
         mapDict[i].reverse()
     return result
 
-def getNextDir(curDir, listDir, x, y):
-    numSteps = [5, 5, 5, 5]
-    coorDir = {
-        0: (x + 1, y) if x != 9 else None,
-        1: (x, y + 1) if y != 9 else None,
-        2: (x - 1, y) if x != 0 else None,
-        3: (x, y - 1) if y != 0 else None
-    }
-    for i in range(4):
-        if coorDir[i] is not None and coorDir[i] in listDir:
-            numSteps[i] = (i - curDir) % 4
-    
-    while 3 in numSteps:
-        numSteps[numSteps.index(3)] = 1.5
-    
-    choosenOne = numSteps.index(min(numSteps))
-
-    listActions = []
-    if numSteps[choosenOne] == 1:
-        listActions = ['turn right']
-    elif numSteps[choosenOne] == 2:
-        listActions = ['turn right', 'turn right']
-    elif numSteps[choosenOne] == 1.5:
-        listActions = ['turn left']
-    
-    if numSteps[choosenOne] != 5:
-        listActions.append('move forward')
-    
-    return coorDir[choosenOne] if numSteps[choosenOne] != 5 else None, listActions
         
 if __name__ == "__main__":
     ABC = Program('test.txt')
