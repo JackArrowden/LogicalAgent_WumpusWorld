@@ -10,6 +10,7 @@ class SystemGUI():
         self.root.title("Delivery system")
         self.font1 = ("Bahnschrift Light SemiCondensed", 12)
         self.font2 = ("Bahnschrift Light SemiCondensed", 20)
+        self.font3 = ("Bahnschrift Light SemiCondensed", 15)
         self.root.option_add("*Font", self.font1)
         
         self.default_text = "Enter input file..."
@@ -177,7 +178,7 @@ class SystemGUI():
     def drawElements(self, canvas):
         # filePath = ["test/wumpus.jpg", "test/pit.jpg", "test/poisonGas.jpg","test/healing.jpg", "test/gold.jpg"]
         # filePath = ["wumpus.png", "test/2.png", "test/3.png", "test/4.png", "test/5.png"]
-        TEXT = ["W", 'P', 'G', 'H', 'G']
+        TEXT = ["W", 'P', 'G', 'H', 'T']
         for i in range(10):
             for j in range(10):
                 for k in range(5):
@@ -290,35 +291,18 @@ class SystemGUI():
         
         ## Sub frame 3 a2
         self.subFrame3a2 = tk.Frame(self.subFrame3a, width = 200)
-        self.subFrame3a2.pack( expand=False, anchor='center', pady = (5, 2)) 
+        self.subFrame3a2.pack(expand=False, anchor='center', pady = (5, 2)) 
         
         self.exitBtn3 = tk.Button(self.subFrame3a2, text = "Exit", command = self.exit, bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
-        self.exitBtn3.pack(pady = (0, 3))
-        
-        ### Sub frame 3 b
-        self.subFrame3b = tk.Canvas(self.frame3, bg = "white", width = self.width, height = self.height)
-        self.subFrame3b.pack(expand=True, anchor='center', pady = (0, 30))  
-        
-        ## Cur state
-        curStep = "Iteration: " + str(self.curNumState)
-        self.curState = tk.Canvas(self.subFrame3a, bg = "#F0F0F0", width = 200, height = 30)
-   
-        self.curState.pack( expand=True, anchor='center', pady = (100, 0))     
-        self.curState.create_text(100, 10, text = curStep, fill = "black", font = self.font2)
-        
-        self.draw_map(self.subFrame3b)
-        
-        # ### Sub frame 3 c
-        # self.subFrame3c = tk.Frame(self.frame3)
-        # self.subFrame3c.pack(expand=True, anchor='center', pady = (15, 10))  
+        self.exitBtn3.pack(pady = (0, 50))
         
         if not isAuto:
             self.prevBtn1 = tk.Button(self.subFrame3a, state = "disabled", text = "Previous", bg = "lightgray", fg = "white", width = 20, height = 2)
-            self.prevBtn2 = tk.Button(self.subFrame3a, text = "Previous", command = lambda: self.prevMap(kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.curState]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
+            self.prevBtn2 = tk.Button(self.subFrame3a, text = "Previous", command = lambda: self.prevMap(kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.subFrame3c1]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
             self.prevBtn1.pack(pady = (5, 5)) 
                 
             self.nextBtn1 = tk.Button(self.subFrame3a, state = "disabled", text = "Next", bg = "lightgray", fg = "white", width = 20, height = 2)
-            self.nextBtn2 = tk.Button(self.subFrame3a, text = "Next", command = lambda: self.nextMap(isAuto = False, kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.curState]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
+            self.nextBtn2 = tk.Button(self.subFrame3a, text = "Next", command = lambda: self.nextMap(isAuto = False, kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.subFrame3c1]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
             self.nextBtn2.pack(pady = (5, 5))
         else:
             self.slowDown1 = tk.Button(self.subFrame3a, text = "Slow down", command = lambda: self.slowDownFunc(kwargs = [self.slowDown1, self.slowDown2, self.speedUp1, self.speedUp2]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
@@ -335,15 +319,103 @@ class SystemGUI():
             else:
                 self.speedUp2.pack(pady = (5, 5))  
             
+        
+        ### Sub frame 3 b
+        self.subFrame3b = tk.Canvas(self.frame3, bg = "white", width = self.width, height = self.height)
+        self.subFrame3b.pack(side = tk.LEFT, expand=True, anchor='center', pady = (0, 30), padx = (0, 15))  
+        
+        self.draw_map(self.subFrame3b)
+
+        ### Sub frame 3 c
+        self.subFrame3c = tk.Frame(self.frame3)
+        self.subFrame3c.pack(side = tk.LEFT,expand=True, anchor='center', padx = (5, 25))    
+
+        ### Sub frame 3 c1
+        self.subFrame3c1 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.1)
+        self.subFrame3c1.pack(anchor='center', padx = (25, 5))
+
+        ### Sub frame 3 c2
+        self.subFrame3c2 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.6)
+        self.subFrame3c2.pack(anchor='center', padx = (25, 5))  
+
+        ## Cur state
+        curStep = "Iteration: " + str(self.curNumState)
+        self.subFrame3c1.pack( expand=True, anchor='center')     
+        self.subFrame3c1.create_text(100, 30, text = curStep, fill = "black", font = self.font2)
+
+        ## Percepts
+        perTitle = "Percepts:"
+        self.subFrame3c2.pack( expand=True, anchor='center')     
+        self.subFrame3c2.create_text(100, 20, text = perTitle, fill = "black", font = self.font2)
+
+        ## Percepts 1
+        perA = "Stench"
+        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
+        self.draw_dot(self.subFrame3c2, 0.85, 0.05, "#3CB371", 5.5, 9, 10)     
+        self.subFrame3c2.create_text(50, 65, text = perA, fill = "black", font = self.font3)
+
+        ## Percepts 1
+        perA = "Breeze"
+        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))  
+        self.draw_dot(self.subFrame3c2, 0.625, 1.6, "#8EE5EE", 5.5, 9, 25)  
+        self.subFrame3c2.create_text(150, 65, text = perA, fill = "black", font = self.font3)
+
+        ## Percepts 2
+        perA = "Whiff"
+        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0)) 
+        self.draw_dot(self.subFrame3c2, 0.85, 0.05, "#8E388E", 5.5, 9, 40)    
+        self.subFrame3c2.create_text(50, 95, text = perA, fill = "black", font = self.font3)
+
+        ## Percepts 2
+        perA = "Glow"
+        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
+        self.draw_dot(self.subFrame3c2, 0.625, 1.6, "#FFF68F", 5.5, 9, 55)     
+        self.subFrame3c2.create_text(150, 95, text = perA, fill = "black", font = self.font3)
+
+        ## Objects
+        objTitle = "Objects:"
+        self.subFrame3c2.pack( expand=True, anchor='center')     
+        self.subFrame3c2.create_text(100, 150, text = objTitle, fill = "black", font = self.font2)
+
+        ## Objects 1
+        objA = "Wumpus"
+        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
+        self.subFrame3c2.create_text(20, 190,  text='W', font=("Arial", 15), fill="Red")
+        self.subFrame3c2.create_text(72, 190, text = objA, fill = "black", font = self.font3)
+
+        ## Objects 1
+        objA = "Pit"
+        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
+        self.subFrame3c2.create_text(120, 190,  text='P', font=("Arial", 15), fill="Red")
+        self.subFrame3c2.create_text(145, 190, text = objA, fill = "black", font = self.font3)
+
+        ## Objects 2
+        objA = "Poison"
+        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
+        self.subFrame3c2.create_text(20, 220,  text='G', font=("Arial", 15), fill="Red")
+        self.subFrame3c2.create_text(65, 220, text = objA, fill = "black", font = self.font3)
+
+        ## Objects 2
+        objA = "Health"
+        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
+        self.subFrame3c2.create_text(120, 220,  text='H', font=("Arial", 15), fill="Red")
+        self.subFrame3c2.create_text(160, 220, text = objA, fill = "black", font = self.font3)
+
+        ## Objects 3
+        objA = "Treasure (Gold)"
+        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
+        self.subFrame3c2.create_text(20, 250,  text='T', font=("Arial", 15), fill="Red")
+        self.subFrame3c2.create_text(100, 250, text = objA, fill = "black", font = self.font3)
+
         if isAuto:
-            curID = self.root.after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = [self.subFrame3b, self.subFrame3a, self.curState]))
+            curID = self.root.after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = [self.subFrame3b, self.subFrame3a, self.subFrame3c1]))
             self.idAfter.add(curID)
 
     def prevMap(self, kwargs = []):
         self.curNumState = self.curNumState - 1
         curStep = "Iteration: " + str(self.curNumState)
         self.clearCanvas(kwargs[5])
-        kwargs[5].create_text(100, 10, text = curStep, fill = "black", font = self.font2)
+        kwargs[5].create_text(100, 30, text = curStep, fill = "black", font = self.font2)
             
         cur = (0, 0)
             
@@ -371,10 +443,10 @@ class SystemGUI():
         curStep = "Iteration: " + str(self.curNumState)
         if isAuto:
             self.clearCanvas(kwargs[2])
-            kwargs[2].create_text(100, 10, text = curStep, fill = "black", font = self.font2)
+            kwargs[2].create_text(100, 30, text = curStep, fill = "black", font = self.font2)
         else:
             self.clearCanvas(kwargs[5])
-            kwargs[5].create_text(100, 10, text = curStep, fill = "black", font = self.font2)
+            kwargs[5].create_text(100, 30, text = curStep, fill = "black", font = self.font2)
         
         # cur = (0, 0)
         if len(self.listRemainCells) > 0:
