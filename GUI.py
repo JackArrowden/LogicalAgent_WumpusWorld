@@ -176,12 +176,16 @@ class SystemGUI():
     
     def drawElements(self, canvas):
         # filePath = ["test/wumpus.jpg", "test/pit.jpg", "test/poisonGas.jpg","test/healing.jpg", "test/gold.jpg"]
-        filePath = ["wumpus.png", "test/2.png", "test/3.png", "test/4.png", "test/5.png"]
+        # filePath = ["wumpus.png", "test/2.png", "test/3.png", "test/4.png", "test/5.png"]
+        TEXT = ["W", 'P', 'G', 'H', 'G']
         for i in range(10):
             for j in range(10):
                 for k in range(5):
                     if self.mapElements[i][j][k]:
-                        self.add_image(canvas, filePath[k], i, j, 20, 19 + (22 if k%2 else 0), 4 +(20* int(k/2)) )
+                        # self.add_image(canvas, filePath[k], i, j, 20, 19 + (22 if k%2 else 0), 4 +(20* int(k/2)) )
+                        x = j*self.cell_size +  29 + (23 if k%2 else 0)
+                        y = i*self.cell_size + 12 +(20* int(k/2)) 
+                        canvas.create_text(x, y,  text=TEXT[k], font=("Arial", 15), fill="Red")
     
     def drawPercepts(self, canvas):  
         color = ["#3CB371","#8EE5EE","#8E388E","#FFF68F"] #  stench, breeze,whiff, glow 
@@ -190,7 +194,7 @@ class SystemGUI():
                 N = 10
                 for k in range(4):
                     if self.mapPercepts[i][j][k]:
-                        self.draw_dot(canvas, i, j, color[k], radius = 4.5, m = 9, n=N)
+                        self.draw_dot(canvas, i, j, color[k], radius = 5.5, m = 9, n=N)
                     N +=15
     
     def draw_map(self, canvas):
@@ -211,6 +215,18 @@ class SystemGUI():
         ## Step by step automatically
         self.stepByStepAutoBtn = tk.Button(self.subFrame2a, text = "Show step by step automatically", command = lambda: self.showFrame3(True), bg = "#323232", fg = "#FAFAFA", width = 40, height = 2, cursor = "hand2")
         self.stepByStepAutoBtn.pack(pady = (10, 10))
+
+        ### Frame b
+        self.subFrame2b = tk.Frame(self.frame2)
+        self.subFrame2b.pack(expand=True, anchor='center', pady = (20, 0)) 
+            
+        ## Back button 1
+        self.backBtn1 = tk.Button(self.subFrame2b, text = "Back", command = self.showFrame1, bg = "#323232", fg = "#FAFAFA", width = 25, height = 2, cursor = "hand2")
+        self.backBtn1.pack(side = tk.LEFT, pady = (10, 10), padx = (0, 30))
+        
+        ## Exit button 2
+        self.exitBtn2 = tk.Button(self.subFrame2b, text = "Exit", command = self.exit, bg = "#323232", fg = "#FAFAFA", width = 25, height = 2, cursor = "hand2")
+        self.exitBtn2.pack(side = tk.LEFT, pady = (10, 10), padx = (30, 0))
 
     def moveContent(self, listA, listB):
         while listA:
@@ -263,64 +279,64 @@ class SystemGUI():
         
         ### Sub frame 3 a
         self.subFrame3a = tk.Frame(self.frame3)
-        self.subFrame3a.pack(expand=True, anchor='center', pady = (5, 15))  
+        self.subFrame3a.pack(side = tk.LEFT,expand=True, anchor='center', pady = (5, 15), padx = (5, 25))  
         
         ## Sub frame 3 a1
         self.subFrame3a1 = tk.Frame(self.subFrame3a, width = 200)
-        self.subFrame3a1.pack(side = tk.LEFT, expand=False, anchor='center', pady = (5, 5))  
+        self.subFrame3a1.pack(expand=False, anchor='center', pady = (5, 2))  
         
         self.backBtn3a1 = tk.Button(self.subFrame3a1, text = "Back", command = self.showFrame2, bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
-        self.backBtn3a1.pack(side = tk.LEFT, pady = (5, 0), padx = (0, 50))
+        self.backBtn3a1.pack(pady = (0, 3))
+        
+        ## Sub frame 3 a2
+        self.subFrame3a2 = tk.Frame(self.subFrame3a, width = 200)
+        self.subFrame3a2.pack( expand=False, anchor='center', pady = (5, 2)) 
+        
+        self.exitBtn3 = tk.Button(self.subFrame3a2, text = "Exit", command = self.exit, bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
+        self.exitBtn3.pack(pady = (0, 3))
+        
+        ### Sub frame 3 b
+        self.subFrame3b = tk.Canvas(self.frame3, bg = "white", width = self.width, height = self.height)
+        self.subFrame3b.pack(expand=True, anchor='center', pady = (0, 30))  
         
         ## Cur state
         curStep = "Iteration: " + str(self.curNumState)
         self.curState = tk.Canvas(self.subFrame3a, bg = "#F0F0F0", width = 200, height = 30)
    
-        self.curState.pack(side = tk.LEFT, expand=True, anchor='center', pady = (20, 0), padx = (50, 50))     
+        self.curState.pack( expand=True, anchor='center', pady = (100, 0))     
         self.curState.create_text(100, 10, text = curStep, fill = "black", font = self.font2)
-        
-        ## Sub frame 3 a2
-        self.subFrame3a2 = tk.Frame(self.subFrame3a, width = 200)
-        self.subFrame3a2.pack(side = tk.LEFT, expand=False, anchor='center', pady = (5, 5)) 
-        
-        self.exitBtn3 = tk.Button(self.subFrame3a2, text = "Exit", command = self.exit, bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
-        self.exitBtn3.pack(side = tk.LEFT, pady = (5, 0), padx = (50, 0))
-        
-        ### Sub frame 3 b
-        self.subFrame3b = tk.Canvas(self.frame3, bg = "white", width = self.width, height = self.height)
-        self.subFrame3b.pack(expand=True, anchor='center', pady = (10, 10))  
         
         self.draw_map(self.subFrame3b)
         
-        ### Sub frame 3 c
-        self.subFrame3c = tk.Frame(self.frame3)
-        self.subFrame3c.pack(expand=True, anchor='center', pady = (15, 10))  
+        # ### Sub frame 3 c
+        # self.subFrame3c = tk.Frame(self.frame3)
+        # self.subFrame3c.pack(expand=True, anchor='center', pady = (15, 10))  
         
         if not isAuto:
-            self.prevBtn1 = tk.Button(self.subFrame3c, state = "disabled", text = "Previous", bg = "lightgray", fg = "white", width = 25, height = 2)
-            self.prevBtn2 = tk.Button(self.subFrame3c, text = "Previous", command = lambda: self.prevMap(kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.curState]), bg = "#323232", fg = "#FAFAFA", width = 25, height = 2, cursor = "hand2")
-            self.prevBtn1.pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))
+            self.prevBtn1 = tk.Button(self.subFrame3a, state = "disabled", text = "Previous", bg = "lightgray", fg = "white", width = 20, height = 2)
+            self.prevBtn2 = tk.Button(self.subFrame3a, text = "Previous", command = lambda: self.prevMap(kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.curState]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
+            self.prevBtn1.pack(pady = (5, 5)) 
                 
-            self.nextBtn1 = tk.Button(self.subFrame3c, state = "disabled", text = "Next", bg = "lightgray", fg = "white", width = 25, height = 2)
-            self.nextBtn2 = tk.Button(self.subFrame3c, text = "Next", command = lambda: self.nextMap(isAuto = False, kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.curState]), bg = "#323232", fg = "#FAFAFA", width = 25, height = 2, cursor = "hand2")
-            self.nextBtn2.pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))
+            self.nextBtn1 = tk.Button(self.subFrame3a, state = "disabled", text = "Next", bg = "lightgray", fg = "white", width = 20, height = 2)
+            self.nextBtn2 = tk.Button(self.subFrame3a, text = "Next", command = lambda: self.nextMap(isAuto = False, kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.curState]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
+            self.nextBtn2.pack(pady = (5, 5))
         else:
-            self.slowDown1 = tk.Button(self.subFrame3c, text = "Slow down", command = lambda: self.slowDownFunc(kwargs = [self.slowDown1, self.slowDown2, self.speedUp1, self.speedUp2]), bg = "#323232", fg = "#FAFAFA", width = 25, height = 2, cursor = "hand2")
-            self.slowDown2 = tk.Button(self.subFrame3c, state = "disabled", text = "Slow down", bg = "lightgray", fg = "white", width = 25, height = 2)
+            self.slowDown1 = tk.Button(self.subFrame3a, text = "Slow down", command = lambda: self.slowDownFunc(kwargs = [self.slowDown1, self.slowDown2, self.speedUp1, self.speedUp2]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
+            self.slowDown2 = tk.Button(self.subFrame3a, state = "disabled", text = "Slow down", bg = "lightgray", fg = "white", width = 20, height = 2)
             if self.autoRunTime[0] == 1:
-                self.slowDown2.pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))  
+                self.slowDown2.pack(pady = (5, 5))  
             else:
-                self.slowDown1.pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))  
+                self.slowDown1.pack(pady = (5, 5))  
             
-            self.speedUp1 = tk.Button(self.subFrame3c, text = "Speed up", command = lambda: self.speedUpFunc(kwargs = [self.slowDown1, self.slowDown2, self.speedUp1, self.speedUp2]), bg = "#323232", fg = "#FAFAFA", width = 25, height = 2, cursor = "hand2")
-            self.speedUp2 = tk.Button(self.subFrame3c, state = "disabled", text = "Speed up", bg = "lightgray", fg = "white", width = 25, height = 2)
+            self.speedUp1 = tk.Button(self.subFrame3a, text = "Speed up", command = lambda: self.speedUpFunc(kwargs = [self.slowDown1, self.slowDown2, self.speedUp1, self.speedUp2]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
+            self.speedUp2 = tk.Button(self.subFrame3a, state = "disabled", text = "Speed up", bg = "lightgray", fg = "white", width = 20, height = 2)
             if self.autoRunTime[0] != len(self.autoRunTime[1]):
-                self.speedUp1.pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))  
+                self.speedUp1.pack(pady = (5, 5))  
             else:
-                self.speedUp2.pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))  
+                self.speedUp2.pack(pady = (5, 5))  
             
         if isAuto:
-            curID = self.root.after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = [self.subFrame3b, self.subFrame3c, self.curState]))
+            curID = self.root.after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = [self.subFrame3b, self.subFrame3a, self.curState]))
             self.idAfter.add(curID)
 
     def prevMap(self, kwargs = []):
@@ -339,11 +355,16 @@ class SystemGUI():
         self.draw_map(kwargs[0])
         
         if len(self.listCells) <= 1:
-            kwargs[1].pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))
+            kwargs[1].pack(pady = (5, 5))
             kwargs[2].pack_forget()
         if not len(self.listRemainCells) == 0:
             kwargs[3].pack_forget()
-            kwargs[4].pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))
+            kwargs[4].pack_forget()
+            kwargs[4].pack(pady = (5, 5))
+        else:
+            kwargs[3].pack_forget()
+            kwargs[4].pack_forget()
+            kwargs[3].pack(pady = (5, 5))
             
     def nextMap(self, isAuto = False, kwargs = []):
         self.curNumState = self.curNumState + 1
@@ -366,11 +387,15 @@ class SystemGUI():
         if not isAuto:
             if not len(self.listCells) == 0:
                 kwargs[1].pack_forget()
-                kwargs[2].pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))
-           
+                kwargs[2].pack(pady = (5, 5))
             if len(self.listRemainCells) == 0:
                 kwargs[4].pack_forget()
-                kwargs[3].pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))
+                kwargs[3].pack(pady = (5, 5))
+            else:
+                kwargs[3].pack_forget()
+                kwargs[4].pack_forget()
+                kwargs[4].pack(pady = (5, 5))
+           
         else:
             if len(self.listRemainCells) != 0:
                 temp = kwargs
@@ -391,20 +416,30 @@ class SystemGUI():
             self.autoRunTime[0] = self.autoRunTime[0] - 1
         if self.autoRunTime[0] == 1:
             kwargs[0].pack_forget()
-            kwargs[1].pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))  
+            kwargs[1].pack(pady = (5, 5))  
         if self.autoRunTime[0] != len(self.autoRunTime[1]):
+            kwargs[2].pack_forget()
             kwargs[3].pack_forget()
-            kwargs[2].pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))  
+            kwargs[2].pack(pady = (5, 5))  
+        else:
+            kwargs[2].pack_forget()
+            kwargs[3].pack_forget()
+            kwargs[3].pack(pady = (5, 5))    
     
     def speedUpFunc(self, kwargs = []):
         if self.autoRunTime[0] < len(self.autoRunTime[1]):
             self.autoRunTime[0] = self.autoRunTime[0] + 1
         if self.autoRunTime[0] != 1:
             kwargs[1].pack_forget()
-            kwargs[0].pack(side = tk.LEFT, pady = (0, 5), padx = (0, 50))  
+            kwargs[0].pack(pady = (5, 5))  
         if self.autoRunTime[0] == len(self.autoRunTime[1]):
             kwargs[2].pack_forget()
-            kwargs[3].pack(side = tk.RIGHT, pady = (0, 5), padx = (50, 0))  
+            kwargs[3].pack_forget() 
+            kwargs[3].pack(pady = (5, 5)) 
+        else:
+            kwargs[2].pack_forget()
+            kwargs[3].pack_forget() 
+            kwargs[2].pack(pady = (5, 5)) 
 
     def exit(self):
         try:
