@@ -57,6 +57,9 @@ class Program:
                 for letter in listEntities:
                     mapDict[letter][i][j] = True
                     
+        for i in mapDict:
+            mapDict[i].reverse()
+                    
     def getPercept(self):
         percept = []
         mapList = [self.mapWumpus, self.mapPit, self.mapPGas, self.mapHPotion, self.mapGold]
@@ -98,10 +101,10 @@ class Program:
     
     def handleMoveForward(self):
         self.gameScore -= 10
-        coorDictNext = [[self.x, self.y - 1] if self.y != 0 else None, 
-                        [self.x + 1, self.y] if self.x != 9 else None, 
+        coorDictNext = [[self.x + 1, self.y] if self.x != 9 else None, 
                         [self.x, self.y + 1] if self.y != 9 else None, 
-                        [self.x - 1, self.y] if self.x != 0 else None]
+                        [self.x - 1, self.y] if self.x != 0 else None, 
+                        [self.x, self.y - 1] if self.y != 0 else None]
         coorXY = coorDictNext[self.direction] 
         if coorXY is not None:
             self.x, self.y = coorXY[0], coorXY[1]
@@ -120,10 +123,10 @@ class Program:
             
     def handleShoot(self):
         self.gameScore -= 100
-        coorDictNext = [[self.x, self.y - 1] if self.y != 0 else None, 
-                        [self.x + 1, self.y] if self.x != 9 else None, 
+        coorDictNext = [[self.x + 1, self.y] if self.x != 9 else None, 
                         [self.x, self.y + 1] if self.y != 9 else None, 
-                        [self.x - 1, self.y] if self.x != 0 else None]
+                        [self.x - 1, self.y] if self.x != 0 else None, 
+                        [self.x, self.y - 1] if self.y != 0 else None]
         coorXY = coorDictNext[self.direction] 
         if coorXY is not None and self.mapWumpus[coorXY[0]][coorXY[1]] == True:
             self.mapWumpus[coorXY[0]][coorXY[1]] = False
@@ -155,10 +158,12 @@ def getAllPercepts(program):
         2: program.mapPGas,
         3: program.mapHPotion
     }
+    for i in mapDict:
+        mapDict[i].reverse()
         
     for i in range(10):
         for j in range(10):
-            for k in range(4):
+            for k in mapDict:
                 if mapDict[k][i][j]:
                     if i != 9:
                         result[i + 1][j][k] = True
@@ -169,6 +174,9 @@ def getAllPercepts(program):
                     if j != 0:
                         result[i][j - 1][k] = True
                 
+    for i in mapDict:
+        mapDict[i].reverse()
+        
     return result
 
 def getAllElements(program):
@@ -180,16 +188,51 @@ def getAllElements(program):
         3: program.mapHPotion,
         4: program.mapGold
     }
-        
+    for i in mapDict:
+        mapDict[i].reverse()        
+
     for i in range(10):
         for j in range(10):
             for k in range(5):
                 result[i][j][k] = mapDict[k][i][j]
                 
+    for i in mapDict:
+        mapDict[i].reverse()
     return result
+
+def getNextDir(curDir, listDir, x, y):
+    numSteps = [5, 5, 5, 5]
+    coorDir = {
+        0: (x + 1, y) if x != 9 else None,
+        1: (x, y + 1) if y != 9 else None,
+        2: (x - 1, y) if x != 0 else None,
+        3: (x, y - 1) if y != 0 else None
+    }
+    for i in range(4):
+        if coorDir[i] is not None and coorDir[i] in listDir:
+            numSteps[i] = (i - curDir) % 4
+    
+    while 3 in numSteps:
+        numSteps[numSteps.index(3)] = 1.5
+    
+    choosenOne = numSteps.index(min(numSteps))
+
+    listActions = []
+    if numSteps[choosenOne] == 1:
+        listActions = ['turn right']
+    elif numSteps[choosenOne] == 2:
+        listActions = ['turn right', 'turn right']
+    elif numSteps[choosenOne] == 1.5:
+        listActions = ['turn left']
+    
+    if numSteps[choosenOne] != 5:
+        listActions.append('move forward')
+    
+    return coorDir[choosenOne] if numSteps[choosenOne] != 5 else None, listActions
         
 if __name__ == "__main__":
     ABC = Program('test.txt')
     # print(ABC.getPercept())
     # print(getAllPercepts(ABC))
-    print(getAllElements(ABC))
+    # print(getAllElements(ABC))
+    print(getNextDir(3, [(1, 3), (2, 4), (3, 3), (2, 2)], 2, 3))
