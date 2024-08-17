@@ -271,6 +271,31 @@ class SystemGUI():
         self.curNumState = 0
         self.stepByStepFrame(isAuto)
 
+    def draw_up(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):
+        canvas.create_line(x, y, x, y - 50, fill=color, width=line_width)
+        canvas.create_polygon(x, y - 50 - 4, x - arrow_size, y - 50 + arrow_size, x + arrow_size, y - 50 + arrow_size, fill=color)
+
+    def draw_down(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):       
+        canvas.create_line(x, y, x, y + 50, fill=color, width=line_width)
+        canvas.create_polygon(x, y + 50 + 4, x - arrow_size, y + 50 - arrow_size, x + arrow_size, y + 50 - arrow_size, fill=color)  
+
+    def draw_left(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):
+        canvas.create_line(x, y, x - 50, y, fill=color, width=line_width)
+        canvas.create_polygon(x - 50 - 4, y, x - 50 + arrow_size, y - arrow_size, x - 50 + arrow_size, y + arrow_size, fill=color)
+
+    def draw_right(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):
+        canvas.create_line(x, y, x + 50, y, fill=color, width=line_width)
+        canvas.create_polygon(x + 50 + 4, y, x + 50 - arrow_size, y - arrow_size, x + 50 - arrow_size, y + arrow_size, fill=color)
+
+
+    # 0: Up, 1: Right, 2: Down, 3: Left
+    def draw_all_direction(self, canvas, x, y, color = "lightblue"):
+        self.draw_up(canvas, x, y, color=color)
+        self.draw_down(canvas, x, y, color=color)
+        self.draw_left(canvas, x, y, color=color)
+        self.draw_right(canvas, x, y, color=color)
+
+
     def stepByStepFrame(self, isAuto): #### Frame 3        
         # if self.isResetList:
         #     self.isResetList = False
@@ -413,15 +438,15 @@ class SystemGUI():
 
         # 0: Up, 1: Right, 2: Down, 3: Left
         direction = self.listCells[len(self.listCells)-1][2]
+        self.draw_all_direction(self.subFrame3c2, 102, 326)
         if direction == 0:
-            self.subFrame3c2.create_text(100, 330, text="^", font=("Arial", 48), fill="blue")
+            self.draw_up(self.subFrame3c2, 102, 326, color = 'red')
         elif direction == 1:
-            self.subFrame3c2.create_text(100, 320, text=">", font=("Arial", 40), fill="blue")        
+            self.draw_right(self.subFrame3c2, 102, 326, color = 'red')       
         elif direction == 2:
-            self.subFrame3c2.create_text(100, 320, text="v", font=("Arial", 36), fill="blue")
+            self.draw_down(self.subFrame3c2, 102, 326, color = 'red')
         elif direction == 3:
-            self.subFrame3c2.create_text(100, 320, text="<", font=("Arial", 40), fill="blue")
-
+            self.draw_left(self.subFrame3c2, 102, 326, color = 'red')
 
         if isAuto:
             curID = self.root.after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = [self.subFrame3b, self.subFrame3a, self.subFrame3c1]))
@@ -442,17 +467,17 @@ class SystemGUI():
         self.clearCanvas(kwargs[0])
         self.draw_map(kwargs[0])
 
-        self.subFrame3c2.create_rectangle(80, 290, 120, 340, fill="white", outline="white")
-        # 0: Up, 1: Right, 2: Down, 3: Left
+       # 0: Up, 1: Right, 2: Down, 3: Left
         direction = self.listCells[len(self.listCells)-1][2]
+        self.draw_all_direction(self.subFrame3c2, 102, 326)
         if direction == 0:
-            self.subFrame3c2.create_text(100, 330, text="^", font=("Arial", 48), fill="blue")
+            self.draw_up(self.subFrame3c2, 102, 326, color = 'red')
         elif direction == 1:
-            self.subFrame3c2.create_text(100, 320, text=">", font=("Arial", 40), fill="blue")        
+            self.draw_right(self.subFrame3c2, 102, 326, color = 'red')       
         elif direction == 2:
-            self.subFrame3c2.create_text(100, 320, text="v", font=("Arial", 36), fill="blue")
+            self.draw_down(self.subFrame3c2, 102, 326, color = 'red')
         elif direction == 3:
-            self.subFrame3c2.create_text(100, 320, text="<", font=("Arial", 40), fill="blue")
+            self.draw_left(self.subFrame3c2, 102, 326, color = 'red')
 
         if len(self.listCells) <= 1:
             kwargs[1].pack(pady = (5, 5))
@@ -484,17 +509,18 @@ class SystemGUI():
         self.clearCanvas(kwargs[0])
         self.draw_map(kwargs[0])
         
-        self.subFrame3c2.create_rectangle(80, 290, 120, 340, fill="white", outline="white")
         # 0: Up, 1: Right, 2: Down, 3: Left
+       # 0: Up, 1: Right, 2: Down, 3: Left
         direction = self.listCells[len(self.listCells)-1][2]
+        self.draw_all_direction(self.subFrame3c2, 102, 326)
         if direction == 0:
-            self.subFrame3c2.create_text(100, 330, text="^", font=("Arial", 48), fill="blue")
+            self.draw_up(self.subFrame3c2, 102, 326, color = 'red')
         elif direction == 1:
-            self.subFrame3c2.create_text(100, 320, text=">", font=("Arial", 40), fill="blue")        
+            self.draw_right(self.subFrame3c2, 102, 326, color = 'red')       
         elif direction == 2:
-            self.subFrame3c2.create_text(100, 320, text="v", font=("Arial", 36), fill="blue")
+            self.draw_down(self.subFrame3c2, 102, 326, color = 'red')
         elif direction == 3:
-            self.subFrame3c2.create_text(100, 320, text="<", font=("Arial", 40), fill="blue")
+            self.draw_left(self.subFrame3c2, 102, 326, color = 'red')
 
         if not isAuto:
             if not len(self.listCells) == 0:
