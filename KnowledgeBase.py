@@ -1,5 +1,6 @@
 from method import *
 import copy
+from pysat.solvers import Glucose3
 
 class KnowledgeBase:
     def __init__(self): 
@@ -42,33 +43,29 @@ class KnowledgeBase:
     def resolution(self, alpha):
         """
         try to prove KB entails alpha
-        :param alpha: A list of clauses
+        :param alpha: A list of clause
         :return: True if KB entails alpha, False for unknown
         """
         alpha = standardize_clause(alpha)
-        not_alpha = not_clauses(alpha)
+        not_alpha = not_clause(alpha)
 
-        prev_clauses = set()
+        g = Glucose3()
+        clause_list = copy.deepcopy(self.KB)
+        negative_alpha = not_alpha
+        for it in clause_list:
+            g.add_clause(it)
+        for it in negative_alpha:
+            g.add_clause(it)
+        sol = g.solve()
+        if sol:
+            return False
+        return True
 
-        cur_clauses = copy.deepcopy(self.KB)
-        cur_clauses.update(not_alpha)
-        new_clauses = set()
-        while True:
-            for clause_i in prev_clauses:
-                for clause_j in cur_clauses:
-                    resolvents = PL_RESOLVE(clause_i, clause_j)
-                    if is_empty(resolvents):
-                        return True
-                    new_clauses.add(resolvents)
-
-            for clause_i in cur_clauses:
-                for clause_j in cur_clauses:
-                    resolvents = PL_RESOLVE(clause_i, clause_j)
-                    if is_empty(resolvents):
-                        return True
-                    new_clauses.add(resolvents)              
-
-            prev_clauses.update(cur_clauses)
-            if new_clauses.issubset(prev_clauses):
-                return False
-            cur_clauses = new_clauses
+if __name__ == '__main__':
+    kb = KnowledgeBase()
+    l = [(-101,), (1001,), (-111,), (-201,), (-211,), (-301,), (-401,), (-102,), (-202,), (-501,), (-411,), (-601,), (-701,), (-801,)]
+    
+    for x in l:
+        kb.add_clause(x)
+    print(kb.resolution((901,)))
+    

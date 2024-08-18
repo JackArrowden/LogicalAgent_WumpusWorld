@@ -25,9 +25,6 @@ def getNextDir(curDir, listDir, x, y):
     elif numSteps[choosenOne] == 1.5:
         listActions = ['turn left']
     
-    if numSteps[choosenOne] != 5:
-        listActions.append('move forward')
-    
     return coorDir[choosenOne] if numSteps[choosenOne] != 5 else None, listActions
 
 def to_1D(x, y):
@@ -55,7 +52,7 @@ def is_signal_percept(predict):
 def stench_infer_exist_wumpus_clause(x, y):
     clause = []
     clause.extend(element_clause(x, y, Constants.STENCH, True))
-    clause.extend(element_clause(x, y, Constants.RELIABLE_S, True))
+    clause.extend(element_clause(x, y, Constants.RELIABLE, True))
     for cell in adj_cell(x, y):
         clause.extend(element_clause(cell[0], cell[1], Constants.WUMPUS))
     return tuple(clause)
@@ -131,7 +128,7 @@ def not_clauses(clauses):
 def not_clause(clause):
     list_clause = []
     for e in clause:
-        list_clause.append(tuple(-e))
+        list_clause.append(tuple([-e]))
     return list_clause
 
 def is_empty(clause):

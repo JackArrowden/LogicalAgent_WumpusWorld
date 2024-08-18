@@ -21,7 +21,7 @@ class Agent:
         self.cost_escaping = dict()
         self.candidate_cells = dict()
 
-        self.taken_actions = [(0, 0)]
+        self.taken_actions = []
 
     def infer_update_KB(self, x, y):
         if self.percepts[(x, y)].have_stench():
@@ -40,12 +40,15 @@ class Agent:
             self.KB.add_clause(whiff_infer_exist_gas_clause(x, y))
         elif self.percepts[(x, y)].have_no_whiff():
             for cell in adj_cell(x, y):
-                self.KB.add_clause(element_clause(x, y, Constants.GAS, True))
+                self.KB.add_clause(element_clause(cell[0], cell[1], Constants.GAS, True))
 
         if self.percepts[(x, y)].have_glow():
             self.KB.add_clause(glow_infer_exist_heal_clause(x, y))
+        elif self.percepts[(x, y)].have_no_glow():
+            for cell in adj_cell(x, y):
+                self.KB.add_clause(element_clause(cell[0], cell[1], Constants.HEAL, True))
 
-        for percept in self.percepts[(x, y)]:
+        for percept in self.percepts[(x, y)].percepts:
             self.KB.update_unit_clause([percept])
 
     def update_KB(self):
@@ -53,15 +56,17 @@ class Agent:
         self.KB.update_unit_clause(element_clause(self.x, self.y, Constants.RELIABLE))
 
     def do(self, action):
+        self.taken_actions.append(((self.x, self.y), action))
+        print(self.x, self.y, action)
         if action == 'shoot':
             pass
         elif action == 'grab':
             if self.percepts[(self.x, self.y)].have_heal():
                 self.num_healing_potion += 1
             elif not self.percepts[(self.x, self.y)].have_gold():
-                raise ValueError('Invalaid action, can not grab anything!')
+                raise ValueError('Invalid action, can not grab anything!')
         elif action == 'climb':
-            if self.x != 0 and self.y != 0:
+            if self.x != 0 or self.y != 0:
                 raise ValueError('Invalid action, this position is not for climb!')
         elif action == 'move forward':
             self.x += Constants.DELTA[self.direction][0]
@@ -78,17 +83,16 @@ class Agent:
             self.health = min(100, self.health + 25)
             self.num_healing_potion -= 1
 
-        self.taken_actions.append(tuple(tuple(self.x, self.y), action))
         self.environment.handleAction(action)
 
-    def infer(self, clauses):
-        if len(clauses) == 1:
-            x = ((clauses[0] - 1) % 100) / 10
-            y = ((clauses[0] - 1) % 100) % 10
-            if (x, y) in self.percepts and self.percepts[(x, y)].is_true(clauses[0]):
+    def infer(self, clause):
+        if len(clause) == 1:
+            x = ((clause[0] - 1) % 100) / 10
+            y = ((clause[0] - 1) % 100) % 10
+            if (x, y) in self.percepts and self.percepts[(x, y)].is_true(clause[0]):
                 return True
         
-        return self.KB.resolution(clauses)
+        return self.KB.resolution(clause)
 
     def update_escaping_cost(self):
         frontier = PriorityQueue()
@@ -100,8 +104,7 @@ class Agent:
         if start_cost == 2000:
             start_cost = 0
         frontier.put((start_cost, self.x, self.y))
-        self.cost_escaping[(x, y)] = start_cost
-
+        self.cost_escaping[(self.x, self.y)] = start_cost
 
         while not frontier.empty():
             cost, x, y = frontier.get()
@@ -121,9 +124,14 @@ class Agent:
 
     def get_target_cell(self):
         problem = Problem(self.percepts, self.cost_escaping, self.candidate_cells, self.num_healing_potion + self.health, (self.x, self.y, self.direction))
+        print('tìm đường đi')
+        for cell, start_cost in self.candidate_cells.items():
+            print(cell, start_cost)
         actions = UCS(problem)
         if actions is None:
+            print('éo có đường đi')
             return False
+        print('thực hiện hành động')
         for action in actions:
             if action == 'move forward': 
                 new_x = self.x + Constants.DELTA[self.direction][0]
@@ -132,9 +140,11 @@ class Agent:
                     self.do('heal')
             self.do(action)
         self.candidate_cells.pop((self.x, self.y))
+        print('tới đường đi tới ô', self.x, self.y)
         return True
 
     def clear_wumpus(self, list_cells: list):
+        print('clear wumpus')
         n = len(list_cells)
 
         for _ in range(n):
@@ -161,7 +171,7 @@ class Agent:
                 change_x = self.x + Constants.DELTA[self.direction][0]
                 change_y = self.y + Constants.DELTA[self.direction][1]
                 self.percepts[(change_x, change_y)].update_percept(element_clause(change_x, change_y, Constants.WUMPUS, True))
-                self.update_KB(self.x, self.y)
+                self.update_KB()
                 self.infer_update_KB(change_x, change_y)
                 for cell in adj_cell(change_x, change_y):
                     if self.percepts[cell].check_visited() and cell[0] != self.x and cell[1] != self.y:
@@ -202,24 +212,30 @@ class Agent:
 
         # insert all expand cells in to candidate list
         for cell in valid_unexpand_cells:
-            candidate = (0, 0, 0)
+            candidate = (0, 0)
             if self.infer(element_clause(cell[0], cell[1], Constants.HEAL)):
                 candidate = sum_cost(candidate, Constants.CERTAINLY_HEAL)
+                print(cell, 'have_heal')
             elif self.infer(element_clause(cell[0], cell[1], Constants.HEAL, True)):
                 self.percepts[cell].update_percept(element_clause(cell[0], cell[1], Constants.HEAL, True))
                 self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.HEAL, True))
+                print(cell, 'no have heal')
             else:
                 candidate = sum_cost(candidate, Constants.ABLE_HEAL)
+                print(cell, 'may be have heal')
 
             if self.infer(element_clause(cell[0], cell[1], Constants.GAS)):
                 candidate = sum_cost(candidate, Constants.CERTAINLY_GAS)
                 self.percepts[cell].update_percept(element_clause(cell[0], cell[1], Constants.GAS))
                 self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.GAS))
+                print(cell, 'have gas')
             elif self.infer(element_clause(cell[0], cell[1], Constants.GAS, True)):
                 self.percepts[cell].update_percept(element_clause(cell[0], cell[1], Constants.GAS, True))
                 self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.GAS, True))
+                print(cell, 'have no gas')            
             else:
                 candidate = sum_cost(candidate, Constants.ABLE_GAS)
+                print(cell, 'may be have gas')
 
             self.candidate_cells[cell] = candidate
 
@@ -238,7 +254,7 @@ class Agent:
         self.cost_escaping = dict()
         self.candidate_cells = dict()
 
-        self.taken_actions = [(0, 0)]
+        self.taken_actions = []
 
         self.environment = program
         self.percepts[(self.x, self.y)].update_percept(self.environment.getPercept())
@@ -248,10 +264,22 @@ class Agent:
         self.analyze()
         
     def explore_world(self):
+        count = 0
         while True:
+            # count += 1
+            # if count == 10:
+            #     break
+            print('=========================================')
             if not self.get_target_cell():
                 break
-            
+            print('current cell percepts: ', self.x, self.y)
+            print(self.percepts[(self.x, self.y)].percepts)
+            # print('list candidate')
+            # for key, value in self.candidate_cells.items():
+            #     print('cell:', key, 'độ ưu tiên', value)
+            #     print('prediction: ', self.percepts[key].percepts)
+            print('xxxxxxxxxxxxxxxx')
+            self.percepts[(self.x, self.y)].update_visited()
             self.percepts[(self.x, self.y)].update_percept(self.environment.getPercept())
             if self.percepts[(self.x, self.y)].have_gold():
                 self.do('grab')
@@ -262,15 +290,23 @@ class Agent:
                         candidate = Constants.CERTAINLY_GAS if self.percepts[cell].have_gas() else Constants.NORMAL
                         candidate = sum_cost(candidate, Constants.VERIFY)
                         self.candidate_cells[cell] = candidate 
-
             self.percepts[(self.x, self.y)].update_percept(self.environment.getPercept())
+            self.update_KB()
+            self.update_escaping_cost()
             self.analyze()
 
         self.candidate_cells.clear()
         self.candidate_cells[(0, 0)] = (0, 0)
         self.get_target_cell()
         self.do('climb')
+        return self.taken_actions
 
 
 if __name__ == '__main__':
-    
+    program = Program('test.txt')
+    agent = Agent()
+    agent.init(program)
+    action = agent.explore_world()
+    print('-----------------')
+    for x in action:
+        print(x[0], x[1])

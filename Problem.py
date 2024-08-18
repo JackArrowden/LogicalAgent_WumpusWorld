@@ -25,7 +25,7 @@ class State:
         return f"State(x={self.x}, y={self.y})"
 
 class Node:
-    def __init__(self, state: State, parent: Optional['Node'] = None, action = None, path_cost = (0, 0)):
+    def __init__(self, state: State, parent: Optional['Node'] = None, action = None, path_cost: tuple = (0, 0)):
         self.state = state
         self.parent = parent
         self.action = action
@@ -52,7 +52,7 @@ class Problem:
         return self.percepts[(current.x, current.y)].have_gas()
     
     def init(self):
-        for start_cell, cost in self.start:
+        for start_cell, cost in self.start.items():
             start_cost = list(cost)
             if start_cell in self.escaping_cost:
                 start_cost[0] += self.escaping_cost[start_cell]
@@ -63,7 +63,7 @@ class Problem:
                         return_cost = min(return_cost, self.escaping_cost[cell] + self.percepts[cell].have_gas())
                 start_cost[0] += return_cost
             for direct in range(4):
-                yield start_cost, State(start_cell[0], start_cell[1], direct)
+                yield tuple(start_cost), State(start_cell[0], start_cell[1], direct)
 
     def ACTIONS(self, current: State) -> list:
         actions = ['turn left', 'turn right']
@@ -71,7 +71,7 @@ class Problem:
         visual_direct = (current.direct + 2) % 4
         new_x = current.x + Constants.DELTA[visual_direct][0]
         new_y = current.y + Constants.DELTA[visual_direct][1]
-        if (new_x, new_y) in self.valid_cells: 
+        if valid_cell(new_x, new_y) and self.percepts[(new_x, new_y)].check_visited(): 
             actions.append('move forward')
 
         return actions
@@ -85,8 +85,8 @@ class Problem:
         elif action == 'turn right':
             new_direct= (new_direct - 1) % 4
         elif action == 'move forward':
-            new_x = new_x + Constants.DELTA[(current.direct + 2) % 4][0]
-            new_y = new_y + Constants.DELTA[(current.direct + 2) % 4][1]
+            new_x += Constants.DELTA[(current.direct + 2) % 4][0]
+            new_y += Constants.DELTA[(current.direct + 2) % 4][1]
 
         return State(new_x, new_y, new_direct)
 
@@ -104,7 +104,7 @@ class Problem:
         for action in self.ACTIONS(cur_state):
             next_state = self.RESULT(cur_state, action)
 
-            cost = sum_cost(node.path_cost + self.ACTION_COST(cur_state, action, next_state))
+            cost = sum_cost(node.path_cost, self.ACTION_COST(cur_state, action, next_state))
             if math.ceil(cost[0]) >= self.max_heal:
                 continue
             yield Node(next_state, node, action, cost)
@@ -114,19 +114,19 @@ def UCS(problem: Problem):
     reached = dict()
     for cost, state in problem.init():
         node = Node(state, None, None, cost)
-        frontier.put(node)
+        frontier.put((cost, node))
         reached[state] = node
     while not frontier.empty():
         cost, node = frontier.get()
 
-        if reached[node.state] != cost:
+        if reached[node.state].path_cost != cost:
             continue
 
-        if problem.is_goal(node):
-            return cost, trace(node)
-
+        if problem.is_goal(node.state):
+            return trace(node)
+        
         for child in problem.EXPAND(node):
-            if not child.state in reached or child.path_cost < reached[child.state].path_cost:
+            if child.state not in reached or child.path_cost < reached[child.state].path_cost:
                 reached[child.state] = child
                 frontier.put((child.path_cost, child))
     return None
