@@ -225,6 +225,7 @@ class SystemGUI():
         elif HP >25: color ="orange" 
         else: color ="red"  
 
+        canvas.create_line(x, y, x + size, y, fill='white', width=width)
         canvas.create_line(x, y, x + len * HP, y, fill=color, width=width)
 
         for i in range (1,5):
@@ -429,7 +430,7 @@ class SystemGUI():
         self.subFrame3c2.create_text(30, 55,  text="HP: ", font =("Arial", 16), fill="Red")
         self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
 
-        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95)
+        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
 
         self.subFrame3c2.create_text(50, 160,  text="Scores: ", font =("Arial", 16), fill="Red")
         self.subFrame3c2.create_text(135, 160,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
@@ -528,9 +529,13 @@ class SystemGUI():
         self.program.handlePrevAction(cur_agent[1], cur_agent[0])
 
         self.draw_map(kwargs[0])
-
-        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width=15)
        
+        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
+        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
+
+        # self.subFrame3c2.create_rectangle
+        self.subFrame3c2.create_text(135, 160,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
+
         # 0: Up, 1: Right, 2: Down, 3: Left
         direction = cur_agent[2]
         self.draw_all_direction(self.subFrame3c2, 102, 267)
@@ -577,11 +582,13 @@ class SystemGUI():
         self.program.handleNextAction(cur_agent[1], cur_agent[0])
 
         self.draw_map(kwargs[0])
+        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
+        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
+
+        self.subFrame3c2.create_text(135, 160,  text='         ', font =("Arial", 18), fill="Red")
+        self.subFrame3c2.create_text(135, 160,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
         
         # 0: Up, 1: Right, 2: Down, 3: Left
-       # 0: Up, 1: Right, 2: Down, 3: Left
-        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width=15)
-
         direction = cur_agent[2]
         self.draw_all_direction(self.subFrame3c2, 102, 267)
         if direction == 0:
