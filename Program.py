@@ -127,6 +127,10 @@ class Program:
         if self.mapHPotion[self.x][self.y] == True:
             self.mapHPotion[self.x][self.y] = False
             self.numPotion += 1
+        
+        if self.mapGold[self.x][self.y] == True:
+            self.mapGold[self.x][self.y] = False
+            self.gameScore += 5000
             
     def handleShoot(self):
         self.gameScore -= 100
@@ -182,6 +186,7 @@ class GUIProgram:
         self.listKilledWumpus = {}
         self.listPickedHPotion = {}
         self.listHealth = {}
+        self.listGold = {}
         self.dictNumWumpus = {}
     
     def getMap(self, file):
@@ -226,8 +231,10 @@ class GUIProgram:
             "turn left": lambda: self.handleTurn(False),
             "turn right": lambda: self.handleTurn(True)
         }
-        
-        _ = dictAction[action]()
+        if dictAction[action] != None:
+            dictAction[action]()
+        else:
+            self.gameScore += 10
     
     def handleNextAction(self, action, pos):
         self.x = 9 - pos[0]
@@ -245,6 +252,8 @@ class GUIProgram:
         }
         if dictAction[action] != None:
             dictAction[action]()
+        else:
+            self.gameScore -= 10
         
     def handleTurn(self, isAdd = True):
         self.gameScore -= 10
@@ -256,6 +265,10 @@ class GUIProgram:
         if nextStep in self.listPickedHPotion:
             self.mapHPotion[self.x][self.y] = True
             self.numPotion -= 1
+            
+        if nextStep in self.listGold:
+            self.mapGold[self.x][self.y] = True
+            self.gameScore -= 5000
         
     def handleNextGrab(self):
         self.gameScore -= 10
@@ -263,6 +276,11 @@ class GUIProgram:
             self.mapHPotion[self.x][self.y] = False
             self.numPotion += 1
             self.listPickedHPotion[self.curStep] = [self.x, self.y]
+            
+        if self.mapGold[self.x][self.y] == True:
+            self.mapGold[self.x][self.y] = False
+            self.gameScore += 5000
+            self.listGold[self.curStep] = [self.x, self.y]
             
     def handlePrevShoot(self):
         self.gameScore += 100
@@ -318,8 +336,6 @@ def getAllPercepts(program):
         2: program.mapPGas,
         3: program.mapHPotion
     }
-    for i in mapDict:
-        mapDict[i].reverse()
         
     for i in range(10):
         for j in range(10):
@@ -334,9 +350,6 @@ def getAllPercepts(program):
                     if j != 0:
                         result[i][j - 1][k] = True
                 
-    for i in mapDict:
-        mapDict[i].reverse()
-        
     return result
 
 def getAllElements(program):
@@ -348,43 +361,38 @@ def getAllElements(program):
         3: program.mapHPotion,
         4: program.mapGold
     }
-    for i in mapDict:
-        mapDict[i].reverse()        
 
     for i in range(10):
         for j in range(10):
             for k in range(5):
                 result[i][j][k] = mapDict[k][i][j]
                 
-    for i in mapDict:
-        mapDict[i].reverse()
     return result
         
 if __name__ == "__main__":
     ABC = GUIProgram()
     ABC.getMap('test.txt')
-    print(ABC.dictNumWumpus)
-    print(ABC.x, ABC.y)
-    print(ABC.isGameWin)
-    ABC.handleNextAction('climb', (0, 0))
-    print(ABC.isGameWin)
+    # ABC.handleNextAction('turn right', (0, 0))
+    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
     # ABC.handleNextAction('move forward', (0, 0))
-    # print(ABC.x, ABC.y)
-    # ABC.handleNextAction('move forward', (1, 0))
-    # print(ABC.x, ABC.y)
-    # print(ABC.isSound)
-    # ABC.handleNextAction('shoot', (2, 0))
-    # print(ABC.isSound)
-    # ABC.handleNextAction('shoot', (2, 0))
-    # print(ABC.isSound)
-    # print(ABC.numPotion)
-    # print(ABC.agentHealth)
-    # ABC.handleNextAction('grab', (2, 0))
-    # print(ABC.numPotion)
-    # print(ABC.agentHealth)
-    # ABC.handleNextAction('heal', (2, 0))
-    # print(ABC.numPotion)
-    # print(ABC.agentHealth)
+    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
+    # ABC.handleNextAction('move forward', (0, 1))
+    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
+    # ABC.handleNextAction('turn left', (0, 2))
+    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
+    # ABC.handleNextAction('move forward', (0, 2))
+    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
+    # ABC.handleNextAction('turn right', (1, 2))
+    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
+    # ABC.handleNextAction('shoot', (1, 2))
+    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
+    # ABC.handleNextAction('turn left', (1, 2))
+    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
+    # ABC.handleNextAction('move forward', (1, 2))
+    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
+    # ABC.handleNextAction('shoot', (2, 2))
+    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
+    
     
     # print(getAllPercepts(ABC))
     # print(getAllElements(ABC))
