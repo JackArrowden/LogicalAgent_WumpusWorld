@@ -436,8 +436,8 @@ class SystemGUI():
         self.subFrame3c2.create_text(30, 55,  text="HP: ", font =("Arial", 16), fill="Red")
         self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
 
-        # self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
-        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, 10)
+        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
+        # self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, 10)
 
         self.subFrame3c2.create_text(50, 165, text="Scores: ", font =("Arial", 16), fill="Red")
         self.subFrame3c2.create_text(135, 165, text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
