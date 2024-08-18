@@ -1,6 +1,6 @@
 def checkOpenFile(file):
     try:
-        with open(file, 'r') as cur:
+        with open(file, 'r') as _:
             return True
     except:
         return False

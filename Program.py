@@ -59,7 +59,7 @@ class Program:
                     mapDict[letter][i][j] = True
                 numwumpus = listEntities.count('W')
                 if numwumpus > 0:
-                    self.dictNumWumpus[[i, j]] = numwumpus
+                    self.dictNumWumpus[(i, j)] = numwumpus
                     
         for i in mapDict:
             mapDict[i].reverse()
@@ -133,8 +133,8 @@ class Program:
                         [self.x, self.y - 1] if self.y != 0 else None]
         coorXY = coorDictNext[self.direction] 
         if coorXY is not None and self.mapWumpus[coorXY[0]][coorXY[1]] == True:
-            self.dictNumWumpus[coorXY[0]][coorXY[1]] -= 1
-            if self.dictNumWumpus[coorXY[0]][coorXY[1]] == 0:
+            self.dictNumWumpus[(coorXY[0], coorXY[1])] -= 1
+            if self.dictNumWumpus[(coorXY[0], coorXY[1])] == 0:
                 self.mapWumpus[coorXY[0]][coorXY[1]] = False
             self.isSound = True
     
@@ -205,7 +205,7 @@ class GUIProgram:
                     mapDict[letter][i][j] = True
                 numwumpus = listEntities.count('W')
                 if numwumpus > 0:
-                    self.dictNumWumpus[[i, j]] = numwumpus
+                    self.dictNumWumpus[(i, j)] = numwumpus
                     
         for i in mapDict:
             mapDict[i].reverse()
@@ -266,7 +266,7 @@ class GUIProgram:
         self.gameScore += 100
         nextStep = self.curStep + 1
         if nextStep in self.listKilledWumpus:
-            self.dictNumWumpus[self.listKilledWumpus[nextStep][0]][self.listKilledWumpus[nextStep][1]] += 1
+            self.dictNumWumpus[(self.listKilledWumpus[nextStep][0], self.listKilledWumpus[nextStep][1])] += 1
             self.mapWumpus[self.listKilledWumpus[nextStep][0]][self.listKilledWumpus[nextStep][1]] = True
             
     def handleNextShoot(self):
@@ -277,10 +277,10 @@ class GUIProgram:
                         [self.x, self.y - 1] if self.y != 0 else None]
         coorXY = coorDictNext[self.direction] 
         if coorXY is not None and self.mapWumpus[coorXY[0]][coorXY[1]] == True:
-            self.dictNumWumpus[coorXY[0]][coorXY[1]] -= 1
+            self.dictNumWumpus[(coorXY[0], coorXY[1])] -= 1
             self.listKilledWumpus[self.curStep] = [coorXY[0], coorXY[1]]
             
-            if self.dictNumWumpus[coorXY[0]][coorXY[1]] == 0:
+            if self.dictNumWumpus[(coorXY[0], coorXY[1])] == 0:
                 self.mapWumpus[coorXY[0]][coorXY[1]] = False
             self.isSound = True
 
