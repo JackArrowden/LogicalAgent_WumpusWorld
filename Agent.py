@@ -57,7 +57,7 @@ class Agent:
 
     def do(self, action):
         self.taken_actions.append(((self.x, self.y), action))
-        print(self.x, self.y, action)
+        # print(self.x, self.y, action)
         if action == 'shoot':
             pass
         elif action == 'grab':
@@ -124,14 +124,14 @@ class Agent:
 
     def get_target_cell(self):
         problem = Problem(self.percepts, self.cost_escaping, self.candidate_cells, self.num_healing_potion + self.health, (self.x, self.y, self.direction))
-        print('tìm đường đi')
+        # print('tìm đường đi')
         for cell, start_cost in self.candidate_cells.items():
             print(cell, start_cost)
         actions = UCS(problem)
         if actions is None:
-            print('éo có đường đi')
+            # print('éo có đường đi')
             return False
-        print('thực hiện hành động')
+        # print('thực hiện hành động')
         for action in actions:
             if action == 'move forward': 
                 new_x = self.x + Constants.DELTA[self.direction][0]
@@ -140,11 +140,11 @@ class Agent:
                     self.do('heal')
             self.do(action)
         self.candidate_cells.pop((self.x, self.y))
-        print('tới đường đi tới ô', self.x, self.y)
+        # print('tới đường đi tới ô', self.x, self.y)
         return True
 
     def clear_wumpus(self, list_cells: list):
-        print('clear wumpus')
+        # print('clear wumpus')
         n = len(list_cells)
 
         for _ in range(n):
@@ -269,16 +269,16 @@ class Agent:
             # count += 1
             # if count == 10:
             #     break
-            print('=========================================')
+            # print('=========================================')
             if not self.get_target_cell():
                 break
-            print('current cell percepts: ', self.x, self.y)
-            print(self.percepts[(self.x, self.y)].percepts)
+            # print('current cell percepts: ', self.x, self.y)
+            # print(self.percepts[(self.x, self.y)].percepts)
             # print('list candidate')
             # for key, value in self.candidate_cells.items():
             #     print('cell:', key, 'độ ưu tiên', value)
             #     print('prediction: ', self.percepts[key].percepts)
-            print('xxxxxxxxxxxxxxxx')
+            # print('xxxxxxxxxxxxxxxx')
             self.percepts[(self.x, self.y)].update_visited()
             self.percepts[(self.x, self.y)].update_percept(self.environment.getPercept())
             if self.percepts[(self.x, self.y)].have_gold():
@@ -302,11 +302,11 @@ class Agent:
         return self.taken_actions
 
 
-if __name__ == '__main__':
-    program = Program('test.txt')
-    agent = Agent()
-    agent.init(program)
-    action = agent.explore_world()
-    print('-----------------')
-    for x in action:
-        print(x[0], x[1])
+# if __name__ == '__main__':
+#     program = Program('test.txt')
+#     agent = Agent()
+#     agent.init(program)
+#     action = agent.explore_world()
+#     print('-----------------')
+#     for x in action:
+#         print(x[0], x[1])
