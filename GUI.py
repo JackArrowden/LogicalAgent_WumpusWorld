@@ -25,6 +25,8 @@ class SystemGUI():
         self.cell_size = 65
         self.HP = 100
 
+        self.program = GUIProgram()
+
         self.fileName = ""
         self.idAfter = set()
         self.map = [[0]]
@@ -104,11 +106,9 @@ class SystemGUI():
             # self.col = len(resultRead[0])
             # self.row = len(resultRead)
             # self.mapPercepts = Program.getAllPercepts
-            program = GUIProgram(f"{self.fileName}.txt")
-            self.mapPercepts = getAllPercepts(program)
-            self.mapElements = getAllElements(program)
-
-            print
+            self.program.getMap(f"{self.fileName}.txt")
+            # self.mapPercepts = getAllPercepts(self.program)
+            # self.mapElements = getAllElements(self.program)
             self.listRemainCells = file.readOutputFile(f"{self.fileName}_result.txt")
             self.showFrame2()
     
@@ -203,6 +203,8 @@ class SystemGUI():
                     N +=15
     
     def draw_map(self, canvas):
+        self.mapPercepts = getAllPercepts(self.program)
+        self.mapElements = getAllElements(self.program)
         self.create_grid(canvas, self.row, self.col, self.cell_size)
         self.drawPercepts(canvas)
         self.drawElements(canvas)
@@ -384,10 +386,15 @@ class SystemGUI():
         ### Sub frame 3 c1
         self.subFrame3c1 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.1)
         self.subFrame3c1.pack(anchor='center', padx = (25, 5))
+        
+        ### Sub frame 3 c3
+        self.subFrame3c3 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.2)
+        self.subFrame3c3.pack(anchor='center', padx = (25, 5))
 
         ### Sub frame 3 c2
         self.subFrame3c2 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.6)
         self.subFrame3c2.pack(anchor='center', padx = (25, 5))  
+
 
         ## Cur state
         curStep = "Iteration: " + str(self.curNumState)
