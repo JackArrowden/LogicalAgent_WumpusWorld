@@ -125,8 +125,8 @@ class Agent:
     def get_target_cell(self):
         problem = Problem(self.percepts, self.cost_escaping, self.candidate_cells, self.num_healing_potion + self.health, (self.x, self.y, self.direction))
         # print('tìm đường đi')
-        for cell, start_cost in self.candidate_cells.items():
-            print(cell, start_cost)
+        # for cell, start_cost in self.candidate_cells.items():
+        #     print(cell, start_cost)
         actions = UCS(problem)
         if actions is None:
             # print('éo có đường đi')
@@ -215,27 +215,27 @@ class Agent:
             candidate = (0, 0)
             if self.infer(element_clause(cell[0], cell[1], Constants.HEAL)):
                 candidate = sum_cost(candidate, Constants.CERTAINLY_HEAL)
-                print(cell, 'have_heal')
+                # print(cell, 'have_heal')
             elif self.infer(element_clause(cell[0], cell[1], Constants.HEAL, True)):
                 self.percepts[cell].update_percept(element_clause(cell[0], cell[1], Constants.HEAL, True))
                 self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.HEAL, True))
-                print(cell, 'no have heal')
+                # print(cell, 'no have heal')
             else:
                 candidate = sum_cost(candidate, Constants.ABLE_HEAL)
-                print(cell, 'may be have heal')
+                # print(cell, 'may be have heal')
 
             if self.infer(element_clause(cell[0], cell[1], Constants.GAS)):
                 candidate = sum_cost(candidate, Constants.CERTAINLY_GAS)
                 self.percepts[cell].update_percept(element_clause(cell[0], cell[1], Constants.GAS))
                 self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.GAS))
-                print(cell, 'have gas')
+                # print(cell, 'have gas')
             elif self.infer(element_clause(cell[0], cell[1], Constants.GAS, True)):
                 self.percepts[cell].update_percept(element_clause(cell[0], cell[1], Constants.GAS, True))
                 self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.GAS, True))
-                print(cell, 'have no gas')            
+                # print(cell, 'have no gas')            
             else:
                 candidate = sum_cost(candidate, Constants.ABLE_GAS)
-                print(cell, 'may be have gas')
+                # print(cell, 'may be have gas')
 
             self.candidate_cells[cell] = candidate
 
@@ -302,11 +302,11 @@ class Agent:
         return self.taken_actions
 
 
-# if __name__ == '__main__':
-#     program = Program('test.txt')
-#     agent = Agent()
-#     agent.init(program)
-#     action = agent.explore_world()
-#     print('-----------------')
-#     for x in action:
-#         print(x[0], x[1])
+if __name__ == '__main__':
+    program = Program('test.txt')
+    agent = Agent()
+    agent.init(program)
+    action = agent.explore_world()
+    # print('-----------------')
+    # for x in action:
+    #     print(x[0], x[1])
