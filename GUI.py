@@ -545,17 +545,26 @@ class SystemGUI():
         self.subFrame3c2.create_rectangle(100, 150, 170, 180, fill="white", outline="white")
         self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
 
+        x_soud = cur_agent[0][0] 
+        y_soud = cur_agent[0][1]
         # 0: Up, 1: Right, 2: Down, 3: Left
         direction = cur_agent[2]
         self.draw_all_direction(self.subFrame3c2, 102, 267)
         if direction == 0:
             self.draw_up(self.subFrame3c2, 102, 267, color = 'red')
+            x_soud -= 1
         elif direction == 1:
             self.draw_right(self.subFrame3c2, 102, 267, color = 'red')       
+            y_soud += 1
         elif direction == 2:
             self.draw_down(self.subFrame3c2, 102, 267, color = 'red')
+            x_soud += 1
         elif direction == 3:
             self.draw_left(self.subFrame3c2, 102, 267, color = 'red')
+            y_soud -= 1
+
+        # if self.program.isSound:
+            # kwargs[0].create_text( y_soud*65, x_soud*65, text = "Grraaahh!", fill = "red", font = ('Blood Drip', 18, 'bold'), anchor='nw')
 
         if len(self.listCells) <= 1:
             kwargs[1].pack(pady = (5, 5))
@@ -589,10 +598,11 @@ class SystemGUI():
         cur_agent = self.listCells[len(self.listCells)-1]
 
         self.program.handleNextAction(cur_agent[1], cur_agent[0])
-
+        
         self.draw_map(kwargs[0])
-        # rows = 50
+
         # cols = 10
+        # rows = 50
         # cell_size = 20
         # for i in range(rows):
         #     for j in range(cols):
@@ -610,17 +620,26 @@ class SystemGUI():
         self.subFrame3c2.create_rectangle(100, 150, 170, 180, fill="white", outline="white")
         self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
         
+        x_soud = cur_agent[0][0] 
+        y_soud = cur_agent[0][1]
         # 0: Up, 1: Right, 2: Down, 3: Left
         direction = cur_agent[2]
         self.draw_all_direction(self.subFrame3c2, 102, 267)
         if direction == 0:
             self.draw_up(self.subFrame3c2, 102, 267, color = 'red')
+            x_soud -= 1
         elif direction == 1:
             self.draw_right(self.subFrame3c2, 102, 267, color = 'red')       
+            y_soud += 1
         elif direction == 2:
             self.draw_down(self.subFrame3c2, 102, 267, color = 'red')
+            x_soud += 1
         elif direction == 3:
             self.draw_left(self.subFrame3c2, 102, 267, color = 'red')
+            y_soud -= 1
+
+        if self.program.isSound:
+            kwargs[0].create_text( y_soud*65, x_soud*65, text = "Grraaahh!", fill = "red", font = ('Blood Drip', 18, 'bold'), anchor='nw')
 
         if not isAuto:
             if not len(self.listCells) == 0:
