@@ -103,17 +103,17 @@ class SystemGUI():
             self.entry.insert("1.0", self.text2)  
             self.entry.mark_set("insert", "1.0")
         else:
-            environment = Program(f"{self.fileName}.txt")
-            agent = Agent()
-            agent.init(environment)
-            file.writeF(f"{self.fileName}_result.txt", agent.explore_world())
             # resultRead = file.readF(self.fileName)
             # self.col = len(resultRead[0])
             # self.row = len(resultRead)
             # self.mapPercepts = Program.getAllPercepts
-            self.program.getMap(f"{self.fileName}.txt")
             # self.mapPercepts = getAllPercepts(self.program)
             # self.mapElements = getAllElements(self.program)
+            environment = Program(f"{self.fileName}.txt")
+            agent = Agent()
+            agent.init(environment)
+            file.writeF(f"{self.fileName}_result.txt", agent.explore_world())
+            self.program.getMap(f"{self.fileName}.txt")
             self.listRemainCells = file.readOutputFile(f"{self.fileName}_result.txt")
             self.showFrame2()
     
@@ -279,6 +279,8 @@ class SystemGUI():
             self.root.after_cancel(after_id)
         self.idAfter.clear()
         
+        self.program.getMap(f"{self.fileName}.txt")
+
         self.isResetList = True
         self.isHead = True
         self.isTail = False
@@ -298,6 +300,7 @@ class SystemGUI():
         self.move1Item(self.listRemainCells, self.listCells)
         
         self.program.handleNextAction(self.listCells[0][1], self.listCells[0][0])
+        self.program.getMap(f"{self.fileName}.txt")
         self.program.agentHealth = 100
 
         self.clearFrame(self.frame3)  
@@ -432,8 +435,8 @@ class SystemGUI():
 
         self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
 
-        self.subFrame3c2.create_text(50, 160,  text="Scores: ", font =("Arial", 16), fill="Red")
-        self.subFrame3c2.create_text(135, 160,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
+        self.subFrame3c2.create_text(50, 165,  text="Scores: ", font =("Arial", 16), fill="Red")
+        self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
 
         self.subFrame3c2.create_text(60, 198,  text="Direction: ", font =("Arial", 16), fill="Red")
         # 0: Up, 1: Right, 2: Down, 3: Left
@@ -533,8 +536,8 @@ class SystemGUI():
         self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
         self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
 
-        # self.subFrame3c2.create_rectangle
-        self.subFrame3c2.create_text(135, 160,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
+        self.subFrame3c2.create_rectangle(130, 160, 140, 170, fill="white", outline="black")
+        self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
 
         # 0: Up, 1: Right, 2: Down, 3: Left
         direction = cur_agent[2]
@@ -585,8 +588,19 @@ class SystemGUI():
         self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
         self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
 
-        self.subFrame3c2.create_text(135, 160,  text='         ', font =("Arial", 18), fill="Red")
-        self.subFrame3c2.create_text(135, 160,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
+        # rows = 50
+        # cols = 10
+        # cell_size = 20
+        # for i in range(rows):
+        #     for j in range(cols):
+        #         x1 = j * cell_size
+        #         y1 = i * cell_size
+        #         x2 = x1 + cell_size
+        #         y2 = y1 + cell_size
+        #         self.subFrame3c2.create_rectangle(x1, y1, x2, y2, fill="", outline="black")
+
+        self.subFrame3c2.create_rectangle(100, 150, 170, 180, fill="white", outline="white")
+        self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
         
         # 0: Up, 1: Right, 2: Down, 3: Left
         direction = cur_agent[2]
