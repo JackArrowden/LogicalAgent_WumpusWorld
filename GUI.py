@@ -384,36 +384,36 @@ class SystemGUI():
         self.subFrame3c.pack(side = tk.LEFT,expand=True, anchor='center', padx = (5, 25))    
 
         ### Sub frame 3 c1
-        self.subFrame3c1 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.1)
+        self.subFrame3c1 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.07)
         self.subFrame3c1.pack(anchor='center', padx = (25, 5))
 
         ## Cur state
         curStep = "Iteration: " + str(self.curNumState)
-        self.subFrame3c1.create_text(100, 30, text = curStep, fill = "black", font = self.font2)
+        self.subFrame3c1.create_text(100, 22, text = curStep, fill = "black", font = self.font2)
         
         ### Sub frame 3 c2
-        self.subFrame3c2 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.4)
+        self.subFrame3c2 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.5)
         self.subFrame3c2.pack(anchor='center', padx = (25, 5))
 
         self.subFrame3c2.create_text(100, 20,  text="AGENT: ", font = self.font2, fill="Red")
         self.subFrame3c2.create_text(30, 55,  text="HP: ", font =("Arial", 16), fill="Red")
-        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth)
-        self.subFrame3c2.create_text(60, 115,  text="Direction: ", font =("Arial", 16), fill="Red")
+        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
 
+        self.subFrame3c2.create_text(60, 115,  text="Direction: ", font =("Arial", 16), fill="Red")
         # 0: Up, 1: Right, 2: Down, 3: Left
         direction = self.listCells[len(self.listCells)-1][2]
-        self.draw_all_direction(self.subFrame3c2, 102, 190)
+        self.draw_all_direction(self.subFrame3c2, 102, 200)
         if direction == 0:
-            self.draw_up(self.subFrame3c2, 102, 190, color = 'red')
+            self.draw_up(self.subFrame3c2, 102, 187, color = 'red')
         elif direction == 1:
-            self.draw_right(self.subFrame3c2, 102, 190, color = 'red')       
+            self.draw_right(self.subFrame3c2, 102, 187, color = 'red')       
         elif direction == 2:
-            self.draw_down(self.subFrame3c2, 102, 190, color = 'red')
+            self.draw_down(self.subFrame3c2, 102, 187, color = 'red')
         elif direction == 3:
-            self.draw_left(self.subFrame3c2, 102, 190, color = 'red')
+            self.draw_left(self.subFrame3c2, 102, 187, color = 'red')
 
         ### Sub frame 3 c3
-        self.subFrame3c3 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.45)
+        self.subFrame3c3 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.42)
         self.subFrame3c3.pack(anchor='center', padx = (25, 5))  
 
         ## Percepts
@@ -494,19 +494,19 @@ class SystemGUI():
 
         self.draw_map(kwargs[0])
 
-        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth)
+        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width=15)
        
         # 0: Up, 1: Right, 2: Down, 3: Left
         direction = cur_agent[2]
-        self.draw_all_direction(self.subFrame3c2, 102, 190)
+        self.draw_all_direction(self.subFrame3c2, 102, 187)
         if direction == 0:
-            self.draw_up(self.subFrame3c2, 102, 190, color = 'red')
+            self.draw_up(self.subFrame3c2, 102, 187, color = 'red')
         elif direction == 1:
-            self.draw_right(self.subFrame3c2, 102, 190, color = 'red')       
+            self.draw_right(self.subFrame3c2, 102, 187, color = 'red')       
         elif direction == 2:
-            self.draw_down(self.subFrame3c2, 102, 190, color = 'red')
+            self.draw_down(self.subFrame3c2, 102, 187, color = 'red')
         elif direction == 3:
-            self.draw_left(self.subFrame3c2, 102, 190, color = 'red')
+            self.draw_left(self.subFrame3c2, 102, 187, color = 'red')
 
         if len(self.listCells) <= 1:
             kwargs[1].pack(pady = (5, 5))
@@ -545,18 +545,18 @@ class SystemGUI():
         
         # 0: Up, 1: Right, 2: Down, 3: Left
        # 0: Up, 1: Right, 2: Down, 3: Left
-        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth)
+        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width=15)
 
         direction = cur_agent[2]
-        self.draw_all_direction(self.subFrame3c2, 102, 190)
+        self.draw_all_direction(self.subFrame3c2, 102, 187)
         if direction == 0:
-            self.draw_up(self.subFrame3c2, 102, 190, color = 'red')
+            self.draw_up(self.subFrame3c2, 102, 187, color = 'red')
         elif direction == 1:
-            self.draw_right(self.subFrame3c2, 102, 190, color = 'red')       
+            self.draw_right(self.subFrame3c2, 102, 187, color = 'red')       
         elif direction == 2:
-            self.draw_down(self.subFrame3c2, 102, 190, color = 'red')
+            self.draw_down(self.subFrame3c2, 102, 187, color = 'red')
         elif direction == 3:
-            self.draw_left(self.subFrame3c2, 102, 190, color = 'red')
+            self.draw_left(self.subFrame3c2, 102, 187, color = 'red')
 
         if not isAuto:
             if not len(self.listCells) == 0:
