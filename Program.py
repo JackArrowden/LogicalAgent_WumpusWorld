@@ -164,8 +164,6 @@ class GUIProgram:
         self.mapPGas = [[False for _ in range(10)] for _ in range(10)] # 300
         self.mapHPotion = [[False for _ in range(10)] for _ in range(10)] # 400
         self.mapGold = [[False for _ in range(10)] for _ in range(10)] # 500
-
-        self.getMap(file)
         
         self.x = 0
         self.y = 0
@@ -223,8 +221,8 @@ class GUIProgram:
             "heal": lambda: self.handlePrevHeal(),
             
             "move forward": None,
-            "turn left": None,
-            "turn right": None
+            "turn left": lambda: self.handleTurn(False),
+            "turn right": lambda: self.handleTurn(True)
         }
         
         _ = dictAction[action]
@@ -242,11 +240,15 @@ class GUIProgram:
             "heal": lambda: self.handleNextHeal(),
             
             "move forward": None,
-            "turn left": None,
-            "turn right": None
+            "turn left": lambda: self.handleTurn(False),
+            "turn right": lambda: self.handleTurn(True)
         }
         
         _ = dictAction[action]
+        
+    def handleTurn(self, isAdd = True):
+        self.gameScore -= 10
+        self.direction = (self.direction + 1) % 4 if isAdd else (self.direction - 1) % 4
         
     def handlePrevGrab(self):
         self.gameScore += 10
