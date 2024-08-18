@@ -21,6 +21,8 @@ class Agent:
         self.cost_escaping = dict()
         self.candidate_cells = dict()
 
+        self.taken_actions = [(0, 0)]
+
     def infer_update_KB(self, x, y):
         if self.percepts[(x, y)].have_stench():
             self.KB.add_clause(stench_infer_exist_wumpus_clause(x, y))
@@ -76,6 +78,7 @@ class Agent:
             self.health = min(100, self.health + 25)
             self.num_healing_potion -= 1
 
+        self.taken_actions.append(tuple(tuple(self.x, self.y), action))
         self.environment.handleAction(action)
 
     def infer(self, clauses):
@@ -87,16 +90,16 @@ class Agent:
         
         return self.KB.resolution(clauses)
 
-    def update_escaping_cost(self, x, y):
+    def update_escaping_cost(self):
         frontier = PriorityQueue()
         start_cost = 2000
-        for cell in adj_cell(x, y):
+        for cell in adj_cell(self.x, self.y):
             if cell in self.cost_escaping:
                 start_cost = min(start_cost, self.cost_escaping[cell] + self.percepts[cell].have_gas())
         
         if start_cost == 2000:
             start_cost = 0
-        frontier.put((start_cost, x, y))
+        frontier.put((start_cost, self.x, self.y))
         self.cost_escaping[(x, y)] = start_cost
 
 
@@ -116,11 +119,20 @@ class Agent:
                     frontier.put((child_cost, cell[0], cell[1]))
                     self.cost_escaping[cell] = child_cost
 
-    # def get_escaping_cost(self, x, y):
-
-    def get_target_state(self):
-        problem = Problem(self.percepts, self.candidate_cells, (self.x, self.y, self.direction))
-        UCS(problem)
+    def get_target_cell(self):
+        problem = Problem(self.percepts, self.cost_escaping, self.candidate_cells, self.num_healing_potion + self.health, (self.x, self.y, self.direction))
+        actions = UCS(problem)
+        if actions is None:
+            return False
+        for action in actions:
+            if action == 'move forward': 
+                new_x = self.x + Constants.DELTA[self.direction][0]
+                new_y = self.y + Constants.DELTA[self.direction][1]
+                if not self.percepts[(new_x, new_y)].have_no_gas() and self.health == 1:
+                    self.do('heal')
+            self.do(action)
+        self.candidate_cells.pop((self.x, self.y))
+        return True
 
     def clear_wumpus(self, list_cells: list):
         n = len(list_cells)
@@ -210,17 +222,34 @@ class Agent:
                 candidate = sum_cost(candidate, Constants.ABLE_GAS)
 
             self.candidate_cells[cell] = candidate
-            
 
     def init(self, program: Program):
+        self.direction = 0
+        self.x = 0
+        self.y = 0
+        self.health = 4
+        self.num_healing_potion = 0
+
+        self.KB = KnowledgeBase()
+        self.percepts = {}
+        for x in range(10):
+            for y in range(10):
+                self.percepts[(x, y)] = CellPercept(x, y)
+        self.cost_escaping = dict()
+        self.candidate_cells = dict()
+
+        self.taken_actions = [(0, 0)]
+
         self.environment = program
-        self.percepts[(self.x, self.y)] = CellPercept(self.x, self.y, self.environment.getPercept(), True)
+        self.percepts[(self.x, self.y)].update_percept(self.environment.getPercept())
+        self.percepts[(self.x, self.y)].update_visited()
         self.update_KB()
+        self.update_escaping_cost()
         self.analyze()
         
     def explore_world(self):
         while True:
-            if not self.get_target_state():
+            if not self.get_target_cell():
                 break
             
             self.percepts[(self.x, self.y)].update_percept(self.environment.getPercept())
@@ -237,10 +266,11 @@ class Agent:
             self.percepts[(self.x, self.y)].update_percept(self.environment.getPercept())
             self.analyze()
 
-        self.candidate_cells.append((0, 0, 'climb'))
-        self.get_target_state()
+        self.candidate_cells.clear()
+        self.candidate_cells[(0, 0)] = (0, 0)
+        self.get_target_cell()
         self.do('climb')
-        
 
 
-
+if __name__ == '__main__':
+    

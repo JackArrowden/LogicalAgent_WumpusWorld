@@ -1,5 +1,4 @@
 from Constants import *
-from CellPercept import *
 
 def getNextDir(curDir, listDir, x, y):
     numSteps = [5, 5, 5, 5]

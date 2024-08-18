@@ -1,7 +1,8 @@
 from typing import Optional
 from Constants import Constants
 from queue import PriorityQueue
-
+from method import *
+import math
 
 class State:
     def __init__(self, x, y, direction):
@@ -34,12 +35,13 @@ class Node:
         return self.path_cost[0] < other.path_cost[0] or (self.path_cost[0] == other.path_cost[0] and self.path_cost[1] < other.path_cost[1])
 
 class Problem:
-    def __init__(self, valid_cells, list_gas, start_list, goal):
-        self.valid_cells = valid_cells
-        self.gas = list_gas
+    def __init__(self, percepts, escaping_cost, start_list, max_heal, goal):
+        self.percepts = percepts
+        self.escaping_cost = escaping_cost 
         self.start = start_list
         self.goal = goal
-    
+        self.max_heal = max_heal
+
     def is_goal(self, current) -> bool:
         return current.x == self.goal[0] and current.y == self.goal[1] and current.direct == self.goal[2]
     
@@ -47,11 +49,21 @@ class Problem:
         return current.x == self.goal[0] and current.y == self.goal[1]
     
     def is_gas_cell(self, current) -> bool:
-        return (current.x, current.y) in self.gas
+        return self.percepts[(current.x, current.y)].have_gas()
     
-    def init(self) -> State:
-        for s in self.start:
-            if 
+    def init(self):
+        for start_cell, cost in self.start:
+            start_cost = list(cost)
+            if start_cell in self.escaping_cost:
+                start_cost[0] += self.escaping_cost[start_cell]
+            else:
+                return_cost = 2000
+                for cell in adj_cell(start_cell[0], start_cell[1]):
+                    if cell in self.escaping_cost:
+                        return_cost = min(return_cost, self.escaping_cost[cell] + self.percepts[cell].have_gas())
+                start_cost[0] += return_cost
+            for direct in range(4):
+                yield start_cost, State(start_cell[0], start_cell[1], direct)
 
     def ACTIONS(self, current: State) -> list:
         actions = ['turn left', 'turn right']
@@ -92,15 +104,18 @@ class Problem:
         for action in self.ACTIONS(cur_state):
             next_state = self.RESULT(cur_state, action)
 
-            cost = node.path_cost + self.ACTION_COST(cur_state, action, next_state)
+            cost = sum_cost(node.path_cost + self.ACTION_COST(cur_state, action, next_state))
+            if math.ceil(cost[0]) >= self.max_heal:
+                continue
             yield Node(next_state, node, action, cost)
 
 def UCS(problem: Problem):
     frontier = PriorityQueue()
     reached = dict()
-    for state, cost in problem.init():
-        frontier.put(Node(state, None, None, cost))
-        reached[state] = node()
+    for cost, state in problem.init():
+        node = Node(state, None, None, cost)
+        frontier.put(node)
+        reached[state] = node
     while not frontier.empty():
         cost, node = frontier.get()
 
@@ -111,11 +126,9 @@ def UCS(problem: Problem):
             return cost, trace(node)
 
         for child in problem.EXPAND(node):
-            if not child.state in reached or child < reached[child.state]:
+            if not child.state in reached or child.path_cost < reached[child.state].path_cost:
                 reached[child.state] = child
                 frontier.put((child.path_cost, child))
-
-
     return None
 
 
@@ -124,8 +137,6 @@ def sum_cost(cost1, cost2):
         raise ValueError("Hai tuple phải có cùng độ dài.")
     
     return tuple(a + b for a, b in zip(cost1, cost2))
-
-def max_cost(cost1, cost2):
 
 def trace(last_node):
     if last_node is None:

@@ -1,16 +1,16 @@
 from Constants import *
-import copy
 from method import *
 
 
 class CellPercept:
-    def __init__(self, x, y, raw_percepts, is_visited = False):
+    def __init__(self, x, y, raw_percepts = None, is_visited = False):
         self.x = x
         self.y = y
         self.index = to_1D(x, y)
         self.is_visited = is_visited
         self.percepts = {*{}}
-        self.update_percept(raw_percepts)
+        if raw_percepts is not None:
+            self.update_percept(raw_percepts)
 
     def update_percept(self, percept):
         if isinstance(percept, int):
