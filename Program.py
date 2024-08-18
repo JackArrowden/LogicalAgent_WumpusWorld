@@ -34,7 +34,6 @@ class Program:
         self.numPotion = 0
         self.isSound = False
         
-        self.isGameOver = False
         self.isGameWin = False
         self.gameScore = 0
     
@@ -59,7 +58,7 @@ class Program:
                     mapDict[letter][i][j] = True
                 numwumpus = listEntities.count('W')
                 if numwumpus > 0:
-                    self.dictNumWumpus[(i, j)] = numwumpus
+                    self.dictNumWumpus[(9 - i, j)] = numwumpus
                     
         for i in mapDict:
             mapDict[i].reverse()
@@ -100,8 +99,7 @@ class Program:
             "climb": lambda: self.handleClimb(),
             "heal": lambda: self.handleHeal()
         }
-        
-        temp = dictAction[action]
+        _ = dictAction[action]()
     
     def handleMoveForward(self):
         self.gameScore -= 10
@@ -147,7 +145,7 @@ class Program:
         self.gameScore -= 10
         if self.numPotion > 0:
             self.numPotion -= 1
-            self.agentHealth = (self.agentHealth + 25) % 100
+            self.agentHealth = (self.agentHealth + 25) % 125
     
     def printPrg(self):
         print("Gold", self.mapGold)
@@ -172,7 +170,6 @@ class GUIProgram:
         self.numPotion = 0
         self.isSound = False
         
-        self.isGameOver = False
         self.isGameWin = False
         self.gameScore = 0
         self.curStep = 0
@@ -203,13 +200,13 @@ class GUIProgram:
                     mapDict[letter][i][j] = True
                 numwumpus = listEntities.count('W')
                 if numwumpus > 0:
-                    self.dictNumWumpus[(i, j)] = numwumpus
+                    self.dictNumWumpus[(9 - i, j)] = numwumpus
                     
         for i in mapDict:
             mapDict[i].reverse()
             
     def handlePrevAction(self, action, pos):
-        self.x = pos[0]
+        self.x = 9 - pos[0]
         self.y = pos[1]
         
         self.curStep -= 1 if self.curStep > 0 else 0
@@ -225,10 +222,10 @@ class GUIProgram:
             "turn right": lambda: self.handleTurn(True)
         }
         
-        _ = dictAction[action]
+        _ = dictAction[action]()
     
     def handleNextAction(self, action, pos):
-        self.x = pos[0]
+        self.x = 9 - pos[0]
         self.y = pos[1]
         
         self.curStep += 1
@@ -244,7 +241,7 @@ class GUIProgram:
             "turn right": lambda: self.handleTurn(True)
         }
         
-        _ = dictAction[action]
+        _ = dictAction[action]()
         
     def handleTurn(self, isAdd = True):
         self.gameScore -= 10
@@ -362,7 +359,17 @@ def getAllElements(program):
         
 if __name__ == "__main__":
     ABC = Program('test.txt')
-    # print(ABC.getPercept())
+    print(ABC.dictNumWumpus)
+    print(ABC.x, ABC.y)
+    ABC.handleAction('move forward')
+    ABC.handleAction('move forward')
+    print(ABC.getPercept())
+    ABC.handleAction('shoot')
+    print(ABC.getPercept())
+    ABC.handleAction('shoot')
+    print(ABC.getPercept())
+    print(ABC.x, ABC.y)
+    
     # print(getAllPercepts(ABC))
     # print(getAllElements(ABC))
     # print(getNextDir(3, [(1, 3), (2, 4), (3, 3), (2, 2)], 2, 3))
