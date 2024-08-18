@@ -1,6 +1,6 @@
 import tkinter as tk
 import file
-from Program import *
+from Program import GUIProgram, getAllElements, getAllPercepts
 from PIL import Image, ImageTk
 
 class SystemGUI():
@@ -36,7 +36,7 @@ class SystemGUI():
         
         self.curNumState = 0
         self.listCells = []
-        self.listRemainCells = [[(0, 1), 'move forward', 0], [(1, 1), 'move forward', 1], [(1, 2), 'turn right', 2], [(1, 2), 'shoot', 3]]
+        self.listRemainCells = []
 
         self.frame1 = tk.Frame(self.root)
         self.frame2 = tk.Frame(self.root)
@@ -95,18 +95,21 @@ class SystemGUI():
             self.entry.delete("1.0", tk.END)
             self.entry.insert("1.0", self.text1)
             self.entry.mark_set("insert", "1.0")
-        elif file.checkOpenFile(self.fileName) == False:
+        elif file.checkOpenFile(f"{self.fileName}.txt") == False:
             self.entry.delete("1.0", tk.END)
             self.entry.insert("1.0", self.text2)  
             self.entry.mark_set("insert", "1.0")
         else:
-            resultRead = file.readF(self.fileName)
-            self.col = len(resultRead[0])
-            self.row = len(resultRead)
+            # resultRead = file.readF(self.fileName)
+            # self.col = len(resultRead[0])
+            # self.row = len(resultRead)
             # self.mapPercepts = Program.getAllPercepts
-            program = Program("test.txt")
+            program = GUIProgram(f"{self.fileName}.txt")
             self.mapPercepts = getAllPercepts(program)
             self.mapElements = getAllElements(program)
+
+            print
+            self.listRemainCells = file.readOutputFile(f"{self.fileName}_result.txt")
             self.showFrame2()
     
     def clearFrame(self, frame):
