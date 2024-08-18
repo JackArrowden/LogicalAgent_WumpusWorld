@@ -363,4 +363,4 @@ if __name__ == "__main__":
     # print(ABC.getPercept())
     # print(getAllPercepts(ABC))
     # print(getAllElements(ABC))
-    print(getNextDir(3, [(1, 3), (2, 4), (3, 3), (2, 2)], 2, 3))
+    # print(getNextDir(3, [(1, 3), (2, 4), (3, 3), (2, 2)], 2, 3))
