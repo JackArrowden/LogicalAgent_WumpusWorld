@@ -521,7 +521,7 @@ class SystemGUI():
         self.curNumState = self.curNumState - 1
         curStep = "Iteration: " + str(self.curNumState)
         self.clearCanvas(kwargs[5])
-        kwargs[5].create_text(100, 30, text = curStep, fill = "black", font = self.font2)
+        kwargs[5].create_text(100, 22, text = curStep, fill = "black", font = self.font2)
             
         cur = (0, 0)
             
@@ -536,9 +536,11 @@ class SystemGUI():
         self.program.handlePrevAction(cur_agent[1], cur_agent[0])
 
         self.draw_map(kwargs[0])
-       
-        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
+
         self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
+       
+        self.subFrame3c2.create_rectangle(20, 95, 182, 140, fill="white", outline="white")
+        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
 
         self.subFrame3c2.create_rectangle(100, 150, 170, 180, fill="white", outline="white")
         self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
@@ -572,10 +574,10 @@ class SystemGUI():
         curStep = "Iteration: " + str(self.curNumState)
         if isAuto:
             self.clearCanvas(kwargs[2])
-            kwargs[2].create_text(100, 30, text = curStep, fill = "black", font = self.font2)
+            kwargs[2].create_text(100, 22, text = curStep, fill = "black", font = self.font2)
         else:
             self.clearCanvas(kwargs[5])
-            kwargs[5].create_text(100, 30, text = curStep, fill = "black", font = self.font2)
+            kwargs[5].create_text(100, 22, text = curStep, fill = "black", font = self.font2)
         
         # cur = (0, 0)
         if len(self.listRemainCells) > 0:
@@ -589,9 +591,6 @@ class SystemGUI():
         self.program.handleNextAction(cur_agent[1], cur_agent[0])
 
         self.draw_map(kwargs[0])
-        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
-        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
-
         # rows = 50
         # cols = 10
         # cell_size = 20
@@ -602,6 +601,11 @@ class SystemGUI():
         #         x2 = x1 + cell_size
         #         y2 = y1 + cell_size
         #         self.subFrame3c2.create_rectangle(x1, y1, x2, y2, fill="", outline="black")
+
+        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
+
+        self.subFrame3c2.create_rectangle(20, 95, 182, 140, fill="white", outline="white")
+        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
 
         self.subFrame3c2.create_rectangle(100, 150, 170, 180, fill="white", outline="white")
         self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
