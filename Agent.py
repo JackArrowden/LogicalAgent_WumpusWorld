@@ -147,17 +147,17 @@ class Agent:
         n = len(list_cells)
 
         for _ in range(n):
-            print('clear wumpus')
+            # print('clear wumpus')
             target_cell, actions = getNextDir(self.direction, list_cells, self.x, self.y)
             for action in actions:
                 self.do(action)
-                print(self.x, self.y, self.direction, action)
+                # print(self.x, self.y, self.direction, action)
             list_cells.remove(target_cell)
 
             kill_wumpus = False
             while True:
                 self.do('shoot')
-                print(self.x, self.y, self.direction, 'shoot')
+                # print(self.x, self.y, self.direction, 'shoot')
                 self.percepts[(self.x, self.y)].update_percept(self.environment.getPercept())
 
                 if self.percepts[(self.x, self.y)].have_no_stench():
