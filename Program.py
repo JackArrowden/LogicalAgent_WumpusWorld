@@ -157,7 +157,7 @@ class Program:
         print("Wumpus", self.mapWumpus)
         
 class GUIProgram:
-    def __init__(self, file):
+    def __init__(self):
         self.size = 10
         self.mapWumpus = [[False for _ in range(10)] for _ in range(10)] # 100
         self.mapPit = [[False for _ in range(10)] for _ in range(10)] # 200
