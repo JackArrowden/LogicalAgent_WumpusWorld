@@ -144,20 +144,21 @@ class Agent:
         return True
 
     def clear_wumpus(self, list_cells: list):
-        # print('clear wumpus')
         n = len(list_cells)
 
         for _ in range(n):
+            print('clear wumpus')
             target_cell, actions = getNextDir(self.direction, list_cells, self.x, self.y)
             for action in actions:
                 self.do(action)
+                print(self.x, self.y, self.direction, action)
             list_cells.remove(target_cell)
 
             kill_wumpus = False
             while True:
                 self.do('shoot')
-                percepts = self.environment.getPercept()
-                self.percepts[(self.x, self.y)].update_percept(percepts)
+                print(self.x, self.y, self.direction, 'shoot')
+                self.percepts[(self.x, self.y)].update_percept(self.environment.getPercept())
 
                 if self.percepts[(self.x, self.y)].have_no_stench():
                     kill_wumpus = True
@@ -166,21 +167,26 @@ class Agent:
                 if self.environment.isSound:
                     kill_wumpus = True
                     continue
+                else:
+                    break
 
             if kill_wumpus:
+                self.update_KB()
                 change_x = self.x + Constants.DELTA[self.direction][0]
                 change_y = self.y + Constants.DELTA[self.direction][1]
                 self.percepts[(change_x, change_y)].update_percept(element_clause(change_x, change_y, Constants.WUMPUS, True))
-                self.update_KB()
                 self.infer_update_KB(change_x, change_y)
                 for cell in adj_cell(change_x, change_y):
                     if self.percepts[cell].check_visited() and cell[0] != self.x and cell[1] != self.y:
-                        self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.RELIABLE, False))
+                        self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.RELIABLE, True))
                         candidate = Constants.CERTAINLY_GAS if self.percepts[cell].have_gas() else Constants.NORMAL
                         candidate = sum_cost(candidate, Constants.VERIFY)
                         self.candidate_cells[cell] = candidate 
 
             if self.percepts[(self.x, self.y)].have_no_stench():
+                for cell in list_cells:
+                    self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.WUMPUS, True))
+                    self.percepts[cell].update_percept(element_clause(cell[0], cell[1], Constants.WUMPUS, True))
                 return
 
     def analyze(self):
@@ -197,6 +203,11 @@ class Agent:
                 self.percepts[cell].update_percept(clause)
                 self.KB.update_unit_clause(clause)
                 valid_unexpand_cells.append(cell)
+                continue
+            clause = element_clause(cell[0], cell[1], Constants.PIT, False)
+            if self.infer(clause):
+                self.percepts[cell].update_percept(clause)
+                self.KB.update_unit_clause(clause)
 
         # clear all wumpus
         wumpus_cells = []
@@ -205,8 +216,10 @@ class Agent:
             if not self.infer(clause):
                 wumpus_cells.append(cell)
                 continue
-            self.percepts[cell].update_percept(clause)
-            self.KB.update_unit_clause(clause)
+            clause = element_clause(cell[0], cell[1], Constants.WUMPUS, False)
+            if self.infer(clause):
+                self.percepts[cell].update_percept(clause)
+                self.KB.update_unit_clause(clause)
 
         self.clear_wumpus(wumpus_cells)
 
@@ -287,6 +300,7 @@ class Agent:
                 self.do('grab')
                 for cell in adj_cell(self.x, self.y):
                     if self.percepts[cell].check_visited():
+                        self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.RELIABLE, True))
                         candidate = Constants.CERTAINLY_GAS if self.percepts[cell].have_gas() else Constants.NORMAL
                         candidate = sum_cost(candidate, Constants.VERIFY)
                         self.candidate_cells[cell] = candidate 
