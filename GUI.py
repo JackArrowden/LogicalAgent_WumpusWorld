@@ -208,13 +208,14 @@ class SystemGUI():
 
     def draw_HP(self, canvas, x, y, size, HP = 100, width = 10):
         len = float(size / 100)
+        
         color = ""
         if HP >75: color = "green"
         elif HP >50: color = "yellow"
         elif HP >25: color ="orange" 
         else: color ="red"  
 
-        canvas.create_line(x, y, x + len * HP, y, fill=color, width=10)
+        canvas.create_line(x, y, x + len * HP, y, fill=color, width=width)
 
         for i in range (1,5):
             x1 = x - 1
