@@ -187,6 +187,7 @@ class GUIProgram:
         self.listPickedHPotion = {}
         self.listHealth = {}
         self.listGold = {}
+        self.listLostBlood = {}
         self.dictNumWumpus = {}
     
     def getMap(self, file):
@@ -216,7 +217,7 @@ class GUIProgram:
         #     mapDict[i].reverse()
             
     def handlePrevAction(self, action, pos):
-        self.x = 9 - pos[0]
+        self.x = pos[0]
         self.y = pos[1]
         
         self.curStep -= 1 if self.curStep > 0 else 0
@@ -226,18 +227,20 @@ class GUIProgram:
             "shoot": lambda: self.handlePrevShoot(),
             "climb": lambda: self.handlePrevClimb(),
             "heal": lambda: self.handlePrevHeal(),
-            
             "move forward": None,
-            "turn left": lambda: self.handleTurn(False),
-            "turn right": lambda: self.handleTurn(True)
+            "turn left": lambda: self.handlePrevTurn(False),
+            "turn right": lambda: self.handlePrevTurn(True)
         }
         if dictAction[action] != None:
             dictAction[action]()
         else:
             self.gameScore += 10
+            nextStep = self.curStep + 1
+            if nextStep in self.listLostBlood:
+                self.agentHealth += 25
     
     def handleNextAction(self, action, pos):
-        self.x = 9 - pos[0]
+        self.x = pos[0]
         self.y = pos[1]
         self.curStep += 1
         self.isSound = False
@@ -247,17 +250,24 @@ class GUIProgram:
             "climb": lambda: self.handleNextClimb(),
             "heal": lambda: self.handleNextHeal(),
             "move forward": None,
-            "turn left": lambda: self.handleTurn(False),
-            "turn right": lambda: self.handleTurn(True)
+            "turn left": lambda: self.handleNextTurn(False),
+            "turn right": lambda: self.handleNextTurn(True)
         }
         if dictAction[action] != None:
             dictAction[action]()
         else:
             self.gameScore -= 10
+        if self.mapPGas[self.x][self.y] == True:
+            self.agentHealth = (self.agentHealth - 25) % 100
+            self.listLostBlood[self.curStep] = [self.x, self.y]
         
-    def handleTurn(self, isAdd = True):
-        self.gameScore -= 10
+    def handlePrevTurn(self, isAdd = True):
+        self.gameScore += 10
         self.direction = (self.direction + 1) % 4 if isAdd else (self.direction - 1) % 4
+        
+    def handleNextTurn(self, isAdd = True):
+        self.gameScore -= 10
+        self.direction = (self.direction - 1) % 4 if isAdd else (self.direction + 1) % 4
         
     def handlePrevGrab(self):
         self.gameScore += 10
