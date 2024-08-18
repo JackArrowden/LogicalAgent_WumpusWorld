@@ -144,7 +144,7 @@ class SystemGUI():
                 canvas.create_rectangle(x1, y1, x2, y2, fill="white", outline="black")
 
         for cell in self.listCells:
-            canvas.create_rectangle(cell[0][0]*cell_size, cell[0][1]*cell_size, (cell[0][0]+1)*cell_size, (cell[0][1]+1)*cell_size, fill="#BBBBBB", outline="black")
+            canvas.create_rectangle(cell[0][1]*cell_size, cell[0][0]*cell_size, (cell[0][1]+1)*cell_size, (cell[0][0]+1)*cell_size, fill="#BBBBBB", outline="black")
 
         hht = rows * cell_size
         wth = cols * cell_size
@@ -209,7 +209,7 @@ class SystemGUI():
         self.drawPercepts(canvas)
         self.drawElements(canvas)
         curPos = self.listCells[len(self.listCells)-1]
-        self.add_image(canvas, "asd.jpg", curPos[0][1], curPos[0][0], 18, 41, 44)
+        self.add_image(canvas, "asd.jpg", curPos[0][0], curPos[0][1], 18, 41, 44)
 
     def draw_HP(self, canvas, x, y, size, HP = 100, width = 10):
         len = float(size / 100)
@@ -402,31 +402,26 @@ class SystemGUI():
         self.subFrame3c1.create_text(100, 30, text = curStep, fill = "black", font = self.font2)
 
         ## Percepts
-        perTitle = "Percepts:"
-        self.subFrame3c2.pack( expand=True, anchor='center')     
+        perTitle = "Percepts:"     
         self.subFrame3c2.create_text(100, 20, text = perTitle, fill = "black", font = self.font2)
 
         ## Percepts 1
         perA = "Stench"
-        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
         self.draw_dot(self.subFrame3c2, 0.85, 0.05, "#3CB371", 5.5, 9, 10)     
         self.subFrame3c2.create_text(50, 65, text = perA, fill = "black", font = self.font3)
 
         ## Percepts 1
-        perA = "Breeze"
-        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))  
+        perA = "Breeze"  
         self.draw_dot(self.subFrame3c2, 0.625, 1.6, "#8EE5EE", 5.5, 9, 25)  
         self.subFrame3c2.create_text(150, 65, text = perA, fill = "black", font = self.font3)
 
         ## Percepts 2
-        perA = "Whiff"
-        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0)) 
+        perA = "Whiff" 
         self.draw_dot(self.subFrame3c2, 0.85, 0.05, "#8E388E", 5.5, 9, 40)    
         self.subFrame3c2.create_text(50, 95, text = perA, fill = "black", font = self.font3)
 
         ## Percepts 2
         perA = "Glow"
-        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
         self.draw_dot(self.subFrame3c2, 0.625, 1.6, "#FFF68F", 5.5, 9, 55)     
         self.subFrame3c2.create_text(150, 95, text = perA, fill = "black", font = self.font3)
 
@@ -437,31 +432,26 @@ class SystemGUI():
 
         ## Objects 1
         objA = "Wumpus"
-        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
         self.subFrame3c2.create_text(20, 190,  text='W', font=("Arial", 15), fill="Red")
         self.subFrame3c2.create_text(72, 190, text = objA, fill = "black", font = self.font3)
 
         ## Objects 1
         objA = "Pit"
-        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
         self.subFrame3c2.create_text(120, 190,  text='P', font=("Arial", 15), fill="Red")
         self.subFrame3c2.create_text(145, 190, text = objA, fill = "black", font = self.font3)
 
         ## Objects 2
         objA = "Poison"
-        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
         self.subFrame3c2.create_text(20, 220,  text='G', font=("Arial", 15), fill="Red")
         self.subFrame3c2.create_text(65, 220, text = objA, fill = "black", font = self.font3)
 
         ## Objects 2
         objA = "Health"
-        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
         self.subFrame3c2.create_text(120, 220,  text='H', font=("Arial", 15), fill="Red")
         self.subFrame3c2.create_text(160, 220, text = objA, fill = "black", font = self.font3)
 
         ## Objects 3
         objA = "Treasure (Gold)"
-        self.subFrame3c2.pack( expand=True, anchor='center', pady = (100, 0))
         self.subFrame3c2.create_text(20, 250,  text='T', font=("Arial", 15), fill="Red")
         self.subFrame3c2.create_text(100, 250, text = objA, fill = "black", font = self.font3)
 
