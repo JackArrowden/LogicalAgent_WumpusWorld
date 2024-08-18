@@ -2,6 +2,7 @@ LIBRARIES TO INSTALL
 
 - Logic processing:
     + pysat: Use Glucose3 to resolve KB
+    + python-sat
 
 - Graphic displaying:
     + tkinter: Main GUI displaying

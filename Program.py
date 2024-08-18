@@ -213,8 +213,23 @@ class GUIProgram:
                 if numwumpus > 0:
                     self.dictNumWumpus[(i, j)] = numwumpus
                     
-        # for i in mapDict:
-        #     mapDict[i].reverse()
+        self.x = 9
+        self.y = 0
+        self.direction = 0 # 0: Up, 1: Right, 2: Down, 3: Left
+        self.agentHealth = 100
+        self.numPotion = 0
+        self.isSound = False
+        
+        self.isGameWin = False
+        self.gameScore = 0
+        self.curStep = 0
+        
+        self.listKilledWumpus = {}
+        self.listPickedHPotion = {}
+        self.listHealth = {}
+        self.listGold = {}
+        self.listLostBlood = {}
+        self.isNewCell = False
             
     def handlePrevAction(self, action, pos):
         self.x = pos[0]
@@ -240,6 +255,8 @@ class GUIProgram:
                 self.agentHealth += 25
     
     def handleNextAction(self, action, pos):
+        if not (self.x == pos[0] and self.y == pos[1]):
+            self.isNewCell = True 
         self.x = pos[0]
         self.y = pos[1]
         self.curStep += 1
@@ -257,7 +274,8 @@ class GUIProgram:
             dictAction[action]()
         else:
             self.gameScore -= 10
-        if self.mapPGas[self.x][self.y] == True:
+        if self.mapPGas[self.x][self.y] == True and self.isNewCell:
+            self.isNewCell = False
             self.agentHealth = (self.agentHealth - 25) % 100
             self.listLostBlood[self.curStep] = [self.x, self.y]
         
