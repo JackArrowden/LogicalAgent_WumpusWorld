@@ -386,86 +386,89 @@ class SystemGUI():
         ### Sub frame 3 c1
         self.subFrame3c1 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.1)
         self.subFrame3c1.pack(anchor='center', padx = (25, 5))
-        
-        ### Sub frame 3 c3
-        self.subFrame3c3 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.2)
-        self.subFrame3c3.pack(anchor='center', padx = (25, 5))
-
-        ### Sub frame 3 c2
-        self.subFrame3c2 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.6)
-        self.subFrame3c2.pack(anchor='center', padx = (25, 5))  
-
 
         ## Cur state
         curStep = "Iteration: " + str(self.curNumState)
-        self.subFrame3c1.pack( expand=True, anchor='center')     
         self.subFrame3c1.create_text(100, 30, text = curStep, fill = "black", font = self.font2)
+        
+        ### Sub frame 3 c2
+        self.subFrame3c2 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.4)
+        self.subFrame3c2.pack(anchor='center', padx = (25, 5))
 
-        ## Percepts
-        perTitle = "Percepts:"     
-        self.subFrame3c2.create_text(100, 20, text = perTitle, fill = "black", font = self.font2)
-
-        ## Percepts 1
-        perA = "Stench"
-        self.draw_dot(self.subFrame3c2, 0.85, 0.05, "#3CB371", 5.5, 9, 10)     
-        self.subFrame3c2.create_text(50, 65, text = perA, fill = "black", font = self.font3)
-
-        ## Percepts 1
-        perA = "Breeze"  
-        self.draw_dot(self.subFrame3c2, 0.625, 1.6, "#8EE5EE", 5.5, 9, 25)  
-        self.subFrame3c2.create_text(150, 65, text = perA, fill = "black", font = self.font3)
-
-        ## Percepts 2
-        perA = "Whiff" 
-        self.draw_dot(self.subFrame3c2, 0.85, 0.05, "#8E388E", 5.5, 9, 40)    
-        self.subFrame3c2.create_text(50, 95, text = perA, fill = "black", font = self.font3)
-
-        ## Percepts 2
-        perA = "Glow"
-        self.draw_dot(self.subFrame3c2, 0.625, 1.6, "#FFF68F", 5.5, 9, 55)     
-        self.subFrame3c2.create_text(150, 95, text = perA, fill = "black", font = self.font3)
-
-        ## Objects
-        objTitle = "Objects:"
-        self.subFrame3c2.pack( expand=True, anchor='center')     
-        self.subFrame3c2.create_text(100, 150, text = objTitle, fill = "black", font = self.font2)
-
-        ## Objects 1
-        objA = "Wumpus"
-        self.subFrame3c2.create_text(20, 190,  text='W', font=("Arial", 15), fill="Red")
-        self.subFrame3c2.create_text(72, 190, text = objA, fill = "black", font = self.font3)
-
-        ## Objects 1
-        objA = "Pit"
-        self.subFrame3c2.create_text(120, 190,  text='P', font=("Arial", 15), fill="Red")
-        self.subFrame3c2.create_text(145, 190, text = objA, fill = "black", font = self.font3)
-
-        ## Objects 2
-        objA = "Poison"
-        self.subFrame3c2.create_text(20, 220,  text='G', font=("Arial", 15), fill="Red")
-        self.subFrame3c2.create_text(65, 220, text = objA, fill = "black", font = self.font3)
-
-        ## Objects 2
-        objA = "Health"
-        self.subFrame3c2.create_text(120, 220,  text='H', font=("Arial", 15), fill="Red")
-        self.subFrame3c2.create_text(160, 220, text = objA, fill = "black", font = self.font3)
-
-        ## Objects 3
-        objA = "Treasure (Gold)"
-        self.subFrame3c2.create_text(20, 250,  text='T', font=("Arial", 15), fill="Red")
-        self.subFrame3c2.create_text(100, 250, text = objA, fill = "black", font = self.font3)
+        self.subFrame3c2.create_text(100, 20,  text="AGENT: ", font = self.font2, fill="Red")
+        self.subFrame3c2.create_text(30, 55,  text="HP: ", font =("Arial", 16), fill="Red")
+        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth)
+        self.subFrame3c2.create_text(60, 115,  text="Direction: ", font =("Arial", 16), fill="Red")
 
         # 0: Up, 1: Right, 2: Down, 3: Left
         direction = self.listCells[len(self.listCells)-1][2]
-        self.draw_all_direction(self.subFrame3c2, 102, 326)
+        self.draw_all_direction(self.subFrame3c2, 102, 190)
         if direction == 0:
-            self.draw_up(self.subFrame3c2, 102, 326, color = 'red')
+            self.draw_up(self.subFrame3c2, 102, 190, color = 'red')
         elif direction == 1:
-            self.draw_right(self.subFrame3c2, 102, 326, color = 'red')       
+            self.draw_right(self.subFrame3c2, 102, 190, color = 'red')       
         elif direction == 2:
-            self.draw_down(self.subFrame3c2, 102, 326, color = 'red')
+            self.draw_down(self.subFrame3c2, 102, 190, color = 'red')
         elif direction == 3:
-            self.draw_left(self.subFrame3c2, 102, 326, color = 'red')
+            self.draw_left(self.subFrame3c2, 102, 190, color = 'red')
+
+        ### Sub frame 3 c3
+        self.subFrame3c3 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.45)
+        self.subFrame3c3.pack(anchor='center', padx = (25, 5))  
+
+        ## Percepts
+        perTitle = "Percepts:"     
+        self.subFrame3c3.create_text(100, 20, text = perTitle, fill = "black", font = self.font2)
+
+        ## Percepts 1
+        perA = "Stench"
+        self.draw_dot(self.subFrame3c3, 0.85, 0.05, "#3CB371", 5.5, 9, 10)     
+        self.subFrame3c3.create_text(50, 65, text = perA, fill = "black", font = self.font3)
+
+        ## Percepts 1
+        perA = "Breeze"  
+        self.draw_dot(self.subFrame3c3, 0.625, 1.6, "#8EE5EE", 5.5, 9, 25)  
+        self.subFrame3c3.create_text(150, 65, text = perA, fill = "black", font = self.font3)
+
+        ## Percepts 2
+        perA = "Whiff" 
+        self.draw_dot(self.subFrame3c3, 0.85, 0.05, "#8E388E", 5.5, 9, 40)    
+        self.subFrame3c3.create_text(50, 95, text = perA, fill = "black", font = self.font3)
+
+        ## Percepts 2
+        perA = "Glow"
+        self.draw_dot(self.subFrame3c3, 0.625, 1.6, "#FFF68F", 5.5, 9, 55)     
+        self.subFrame3c3.create_text(150, 95, text = perA, fill = "black", font = self.font3)
+
+        ## Objects
+        objTitle = "Objects:"
+        self.subFrame3c3.pack( expand=True, anchor='center')     
+        self.subFrame3c3.create_text(100, 150, text = objTitle, fill = "black", font = self.font2)
+
+        ## Objects 1
+        objA = "Wumpus"
+        self.subFrame3c3.create_text(20, 190,  text='W', font=("Arial", 15), fill="Red")
+        self.subFrame3c3.create_text(72, 190, text = objA, fill = "black", font = self.font3)
+
+        ## Objects 1
+        objA = "Pit"
+        self.subFrame3c3.create_text(120, 190,  text='P', font=("Arial", 15), fill="Red")
+        self.subFrame3c3.create_text(145, 190, text = objA, fill = "black", font = self.font3)
+
+        ## Objects 2
+        objA = "Poison"
+        self.subFrame3c3.create_text(20, 220,  text='G', font=("Arial", 15), fill="Red")
+        self.subFrame3c3.create_text(65, 220, text = objA, fill = "black", font = self.font3)
+
+        ## Objects 2
+        objA = "Health"
+        self.subFrame3c3.create_text(120, 220,  text='H', font=("Arial", 15), fill="Red")
+        self.subFrame3c3.create_text(160, 220, text = objA, fill = "black", font = self.font3)
+
+        ## Objects 3
+        objA = "Treasure (Gold)"
+        self.subFrame3c3.create_text(20, 250,  text='T', font=("Arial", 15), fill="Red")
+        self.subFrame3c3.create_text(100, 250, text = objA, fill = "black", font = self.font3)
 
         if isAuto:
             curID = self.root.after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = [self.subFrame3b, self.subFrame3a, self.subFrame3c1]))
@@ -484,19 +487,26 @@ class SystemGUI():
             self.listRemainCells.insert(0, cur)
             
         self.clearCanvas(kwargs[0])
+
+        cur_agent = self.listCells[len(self.listCells)-1]
+
+        self.program.handlePrevAction(cur_agent[1], cur_agent[0])
+
         self.draw_map(kwargs[0])
 
-       # 0: Up, 1: Right, 2: Down, 3: Left
-        direction = self.listCells[len(self.listCells)-1][2]
-        self.draw_all_direction(self.subFrame3c2, 102, 326)
+        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth)
+       
+        # 0: Up, 1: Right, 2: Down, 3: Left
+        direction = cur_agent[2]
+        self.draw_all_direction(self.subFrame3c2, 102, 190)
         if direction == 0:
-            self.draw_up(self.subFrame3c2, 102, 326, color = 'red')
+            self.draw_up(self.subFrame3c2, 102, 190, color = 'red')
         elif direction == 1:
-            self.draw_right(self.subFrame3c2, 102, 326, color = 'red')       
+            self.draw_right(self.subFrame3c2, 102, 190, color = 'red')       
         elif direction == 2:
-            self.draw_down(self.subFrame3c2, 102, 326, color = 'red')
+            self.draw_down(self.subFrame3c2, 102, 190, color = 'red')
         elif direction == 3:
-            self.draw_left(self.subFrame3c2, 102, 326, color = 'red')
+            self.draw_left(self.subFrame3c2, 102, 190, color = 'red')
 
         if len(self.listCells) <= 1:
             kwargs[1].pack(pady = (5, 5))
@@ -526,20 +536,27 @@ class SystemGUI():
             self.listCells.append(cur)
             
         self.clearCanvas(kwargs[0])
+
+        cur_agent = self.listCells[len(self.listCells)-1]
+
+        self.program.handleNextAction(cur_agent[1], cur_agent[0])
+
         self.draw_map(kwargs[0])
         
         # 0: Up, 1: Right, 2: Down, 3: Left
        # 0: Up, 1: Right, 2: Down, 3: Left
-        direction = self.listCells[len(self.listCells)-1][2]
-        self.draw_all_direction(self.subFrame3c2, 102, 326)
+        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth)
+
+        direction = cur_agent[2]
+        self.draw_all_direction(self.subFrame3c2, 102, 190)
         if direction == 0:
-            self.draw_up(self.subFrame3c2, 102, 326, color = 'red')
+            self.draw_up(self.subFrame3c2, 102, 190, color = 'red')
         elif direction == 1:
-            self.draw_right(self.subFrame3c2, 102, 326, color = 'red')       
+            self.draw_right(self.subFrame3c2, 102, 190, color = 'red')       
         elif direction == 2:
-            self.draw_down(self.subFrame3c2, 102, 326, color = 'red')
+            self.draw_down(self.subFrame3c2, 102, 190, color = 'red')
         elif direction == 3:
-            self.draw_left(self.subFrame3c2, 102, 326, color = 'red')
+            self.draw_left(self.subFrame3c2, 102, 190, color = 'red')
 
         if not isAuto:
             if not len(self.listCells) == 0:
