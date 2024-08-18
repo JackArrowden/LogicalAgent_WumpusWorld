@@ -54,14 +54,16 @@ def readOutputFile(file):
             cur = allSteps[i].strip().split(':')
             pos = list(cur[0])
             cell.append([int(cur[0].split(',')[0][1:]), int(cur[0].split(',')[1][1:-1])])
+            cell[0][0] = 9 - cell[0][0]
+            
             cell.append(cur[1][1:])
+            cell.append(direction)
             
             if cell[1] == 'turn right':
                 direction = (direction + 1) % 4
             elif cell[1] == 'turn left':
                 direction = (direction - 1) % 4
                 
-            cell.append(direction)
             
             listCells.append(cell)
           
