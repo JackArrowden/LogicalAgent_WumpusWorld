@@ -347,12 +347,15 @@ class SystemGUI():
         photo = ImageTk.PhotoImage(resized_image)
         self.images.append(photo)  
 
-        for i in range(5):
-            canvas.create_image(x +i*17, y, anchor='nw', image=photo)
+        if quantity < 5: num_loop = quantity
+        else: num_loop = 5
+
+        for i in range(num_loop):
+            canvas.create_image(x +i*18, y, anchor='nw', image=photo)
             canvas.image = photo
-        
+    
         if quantity > 5:
-            canvas.create_text( x + 115, y + new_height - 20, text = f"  + {quantity - 5} ", font=("Arial", 25), fill="Red")
+            canvas.create_text( x + 130, y + new_height - 25, text = f"+ {quantity - 5} ", font=("Arial", 23), fill="Red")
 
     def stepByStepFrame(self, isAuto): #### Frame 3        
         # if self.isResetList:
@@ -433,10 +436,11 @@ class SystemGUI():
         self.subFrame3c2.create_text(30, 55,  text="HP: ", font =("Arial", 16), fill="Red")
         self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
 
-        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
+        # self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
+        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, 10)
 
-        self.subFrame3c2.create_text(50, 165,  text="Scores: ", font =("Arial", 16), fill="Red")
-        self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
+        self.subFrame3c2.create_text(50, 165, text="Scores: ", font =("Arial", 16), fill="Red")
+        self.subFrame3c2.create_text(135, 165, text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
 
         self.subFrame3c2.create_text(60, 198,  text="Direction: ", font =("Arial", 16), fill="Red")
         # 0: Up, 1: Right, 2: Down, 3: Left
@@ -536,7 +540,7 @@ class SystemGUI():
         self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
         self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
 
-        self.subFrame3c2.create_rectangle(130, 160, 140, 170, fill="white", outline="black")
+        self.subFrame3c2.create_rectangle(100, 150, 170, 180, fill="white", outline="white")
         self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
 
         # 0: Up, 1: Right, 2: Down, 3: Left
