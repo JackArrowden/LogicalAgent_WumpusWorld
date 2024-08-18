@@ -82,6 +82,8 @@ class Program:
             for index, curMap in enumerate(mapList):
                 if curMap[pairCoor[0]][pairCoor[1]] == True:
                     percept.append([(index + 6) * 100 + self.x * 10 + self.y + 1])
+                else:
+                    percept.append([- (index + 6) * 100 - self.x * 10 - self.y - 1])
                     
         if self.isSound:
             percept.append([1301])
