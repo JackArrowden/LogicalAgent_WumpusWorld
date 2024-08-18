@@ -57,7 +57,8 @@ class Agent:
 
     def do(self, action):
         self.taken_actions.append(((self.x, self.y), action))
-        # print(self.x, self.y, action)
+        print(self.x, self.y, self.health, action)
+        self.environment.handleAction(action)
         if action == 'shoot':
             pass
         elif action == 'grab':
@@ -73,6 +74,10 @@ class Agent:
             self.y += Constants.DELTA[self.direction][1]
             if not valid_cell(self.x, self.y):
                 raise ValueError('Invalid action, move out of map!')
+            if [to_1D(self.x, self.y) + Constants.GAS] in self.environment.getPercept():
+                self.health -= 1
+            if self.health == 0:
+                raise ValueError('zero health')
         elif action == 'turn left':
             self.direction = (self.direction + 3) % 4
         elif action == 'turn right':
@@ -80,10 +85,9 @@ class Agent:
         elif action == 'heal':
             if self.num_healing_potion == 0:
                 raise ValueError('Invalid action, there is no healing potion')   
-            self.health = min(100, self.health + 25)
+            self.health = min(4, self.health + 1)
             self.num_healing_potion -= 1
 
-        self.environment.handleAction(action)
 
     def infer(self, clause):
         if len(clause) == 1:
