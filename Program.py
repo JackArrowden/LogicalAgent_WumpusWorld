@@ -20,7 +20,7 @@ class Program:
         # Breeze:      701 -> 800
         # Whiff:       801 -> 900
         # Glow:        901 -> 1000
-        # Save cell:  1001 -> 1100
+        # Safe cell:  1001 -> 1100
         # Visited:    1101 -> 1200
         # Reliable:   1201 -> 1300
         # Sound:      1301
@@ -69,6 +69,8 @@ class Program:
         for index, curMap in enumerate(mapList):
             if curMap[self.x][self.y] == True:
                 percept.append([(index + 1) * 100 + self.x * 10 + self.y + 1])
+            else:
+                percept.append([-(index + 1) * 100 - self.x * 10 - self.y - 1])
                 
         mapList = [self.mapWumpus, self.mapPit, self.mapPGas, self.mapHPotion]
         coorDict = [[self.x, self.y - 1] if self.y != 0 else None, 
@@ -80,13 +82,14 @@ class Program:
             if pairCoor is None:
                 continue
             for index, curMap in enumerate(mapList):
+                curPercept = (index + 6) * 100 + self.x * 10 + self.y + 1
                 if curMap[pairCoor[0]][pairCoor[1]] == True:
-                    percept.append([(index + 6) * 100 + self.x * 10 + self.y + 1])
-                else:
-                    percept.append([- (index + 6) * 100 - self.x * 10 - self.y - 1])
-                    
-        if self.isSound:
-            percept.append([1301])
+                    percept.append([curPercept])
+        
+        for i in range(4):
+            curPercept = (i + 6) * 100 + self.x * 10 + self.y + 1
+            if [curPercept] not in percept:
+                percept.append([-curPercept])
                     
         return percept
     
@@ -365,6 +368,7 @@ if __name__ == "__main__":
     print(ABC.x, ABC.y)
     ABC.handleAction('move forward')
     ABC.handleAction('move forward')
+    print(ABC.x, ABC.y)
     print(ABC.getPercept())
     ABC.handleAction('shoot')
     print(ABC.getPercept())
