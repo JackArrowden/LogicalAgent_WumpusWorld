@@ -154,7 +154,7 @@ class SystemGUI():
         canvas.create_line([(0, 2), (wth, 2)], fill='black')
         canvas.create_line([(0, hht), (wth, hht)], fill='black')
 
-    def add_image(self,canvas, image_path, row, col, image_size=65, x=0, y=0 ):
+    def add_image(self,canvas, image_path, row=0, col=0, image_size=65, x=0, y=0 ):
         image = Image.open(image_path)
         image = image.resize((image_size, image_size), Image.Resampling.LANCZOS)
         
@@ -165,6 +165,26 @@ class SystemGUI():
         y = row * self.cell_size + y
         canvas.create_image(x, y, anchor='nw', image=photo)
         canvas.image = photo
+
+    def add_Healing_potion(self,canvas, image_size = 30, x=0, y=0 ):
+        image_path = "Healing_potion.png"
+        image = Image.open(image_path)
+
+        original_width, original_height = image.size
+
+        scale_factor = image_size
+
+        new_width = int(original_width * scale_factor)
+        new_height = int(original_height * scale_factor)
+
+        resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        photo = ImageTk.PhotoImage(resized_image)
+        self.images.append(photo)  
+
+        canvas.create_image(x, y, anchor='nw', image=photo)
+        canvas.image = photo
+
 
     def draw_dot(self, canvas, row, col, color="red", radius=10, m = 10, n=10):
         x = col * self.cell_size + m
@@ -291,6 +311,9 @@ class SystemGUI():
         self.moveContent(self.listCells, self.listRemainCells)
         self.move1Item(self.listRemainCells, self.listCells)
         
+        self.program.handleNextAction(self.listCells[0][1], self.listCells[0][0])
+        self.program.agentHealth = 100
+        
         self.clearFrame(self.frame3)  
         self.curNumState = 0
         self.stepByStepFrame(isAuto)
@@ -399,18 +422,23 @@ class SystemGUI():
         self.subFrame3c2.create_text(30, 55,  text="HP: ", font =("Arial", 16), fill="Red")
         self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
 
-        self.subFrame3c2.create_text(60, 115,  text="Direction: ", font =("Arial", 16), fill="Red")
+        self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95)
+
+        self.subFrame3c2.create_text(50, 160,  text="Scores: ", font =("Arial", 16), fill="Red")
+        self.subFrame3c2.create_text(135, 160,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
+
+        self.subFrame3c2.create_text(60, 198,  text="Direction: ", font =("Arial", 16), fill="Red")
         # 0: Up, 1: Right, 2: Down, 3: Left
         direction = self.listCells[len(self.listCells)-1][2]
-        self.draw_all_direction(self.subFrame3c2, 102, 200)
+        self.draw_all_direction(self.subFrame3c2, 102, 267)
         if direction == 0:
-            self.draw_up(self.subFrame3c2, 102, 187, color = 'red')
+            self.draw_up(self.subFrame3c2, 102, 267, color = 'red')
         elif direction == 1:
-            self.draw_right(self.subFrame3c2, 102, 187, color = 'red')       
+            self.draw_right(self.subFrame3c2, 102, 267, color = 'red')       
         elif direction == 2:
-            self.draw_down(self.subFrame3c2, 102, 187, color = 'red')
+            self.draw_down(self.subFrame3c2, 102, 267, color = 'red')
         elif direction == 3:
-            self.draw_left(self.subFrame3c2, 102, 187, color = 'red')
+            self.draw_left(self.subFrame3c2, 102, 267, color = 'red')
 
         ### Sub frame 3 c3
         self.subFrame3c3 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.42)

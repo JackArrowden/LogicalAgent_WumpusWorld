@@ -46,21 +46,48 @@ def draw_all_direction(canvas, x, y, color = "lightblue"):
     draw_right(canvas, x, y, color=color)
 
 
+def draw_potion(canvas):
+    # Hình dạng bình
+    canvas.create_polygon(
+        150, 10,  # Đỉnh của nắp bình
+        130, 40,  # Góc trái trên cùng của thân bình
+        130, 140, # Góc trái dưới cùng của thân bình
+        170, 140, # Góc phải dưới cùng của thân bình
+        170, 40,  # Góc phải trên cùng của thân bình
+        fill="lightpink", outline="black"
+    )
+    
+    # Chất lỏng trong bình
+    canvas.create_polygon(
+        135, 45, 
+        135, 135, 
+        165, 135, 
+        165, 45, 
+        fill="red", outline="darkred"
+    )
+    
+    # Nắp bình
+    canvas.create_polygon(
+        140, 0,  # Đỉnh của nắp bình
+        130, 20,  # Góc trái dưới của nắp bình
+        170, 20,  # Góc phải dưới của nắp bình
+        160, 0,  # Đỉnh của nắp bình
+        fill="gray", outline="black"
+    )
 
-# Create the main window
-root = tk.Tk()
-root.title("Draw Arrows in 4 Directions")
+    # Thêm chi tiết trang trí
+    canvas.create_oval(135, 10, 165, 40, outline="gold", width=2)
 
-# Create canvas
-canvas = tk.Canvas(root, width=800, height=400, bg="white")
-canvas.pack()
+def main():
+    root = tk.Tk()
+    root.title("Healing Potion")
+    
+    canvas = tk.Canvas(root, width=300, height=200, bg="darkslateblue")
+    canvas.pack()
+    
+    draw_potion(canvas)
+    
+    root.mainloop()
 
-# draw_all_direction(canvas, 100, 100)
-
-# draw_up(canvas, 100, 100,'red')
-draw_HP(canvas,10, 100, 400, 10)
-draw_HP(canvas,10, 150, 400, 65)
-draw_HP(canvas,10, 200, 200, 40)
-
-# Run the application
-root.mainloop()
+if __name__ == "__main__":
+    main()
