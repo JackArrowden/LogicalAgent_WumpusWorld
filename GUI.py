@@ -1,6 +1,7 @@
 import tkinter as tk
 import file
-from Program import GUIProgram, getAllElements, getAllPercepts
+from Program import Program, GUIProgram, getAllElements, getAllPercepts
+from Agent import Agent
 from PIL import Image, ImageTk
 
 class SystemGUI():
@@ -102,6 +103,10 @@ class SystemGUI():
             self.entry.insert("1.0", self.text2)  
             self.entry.mark_set("insert", "1.0")
         else:
+            environment = Program(f"{self.fileName}.txt")
+            agent = Agent()
+            agent.init(environment)
+            file.writeF(f"{self.fileName}_result.txt", agent.explore_world())
             # resultRead = file.readF(self.fileName)
             # self.col = len(resultRead[0])
             # self.row = len(resultRead)
@@ -165,26 +170,6 @@ class SystemGUI():
         y = row * self.cell_size + y
         canvas.create_image(x, y, anchor='nw', image=photo)
         canvas.image = photo
-
-    def add_Healing_potion(self,canvas, image_size = 30, x=0, y=0 ):
-        image_path = "Healing_potion.png"
-        image = Image.open(image_path)
-
-        original_width, original_height = image.size
-
-        scale_factor = image_size
-
-        new_width = int(original_width * scale_factor)
-        new_height = int(original_height * scale_factor)
-
-        resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
-        
-        photo = ImageTk.PhotoImage(resized_image)
-        self.images.append(photo)  
-
-        canvas.create_image(x, y, anchor='nw', image=photo)
-        canvas.image = photo
-
 
     def draw_dot(self, canvas, row, col, color="red", radius=10, m = 10, n=10):
         x = col * self.cell_size + m
@@ -313,7 +298,7 @@ class SystemGUI():
         
         self.program.handleNextAction(self.listCells[0][1], self.listCells[0][0])
         self.program.agentHealth = 100
-        
+
         self.clearFrame(self.frame3)  
         self.curNumState = 0
         self.stepByStepFrame(isAuto)
@@ -342,6 +327,28 @@ class SystemGUI():
         self.draw_left(canvas, x, y, color=color)
         self.draw_right(canvas, x, y, color=color)
 
+    def add_Healing_potion(self,canvas, image_size = 30, x=0, y=0, quantity = 6):
+        image_path = "Healing_potion.png"
+        image = Image.open(image_path)
+
+        original_width, original_height = image.size
+
+        scale_factor = image_size
+
+        new_width = int(original_width * scale_factor)
+        new_height = int(original_height * scale_factor)
+
+        resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        photo = ImageTk.PhotoImage(resized_image)
+        self.images.append(photo)  
+
+        for i in range(5):
+            canvas.create_image(x +i*17, y, anchor='nw', image=photo)
+            canvas.image = photo
+        
+        if quantity > 5:
+            canvas.create_text( x + 115, y + new_height - 20, text = f"  + {quantity - 5} ", font=("Arial", 25), fill="Red")
 
     def stepByStepFrame(self, isAuto): #### Frame 3        
         # if self.isResetList:
@@ -526,15 +533,15 @@ class SystemGUI():
        
         # 0: Up, 1: Right, 2: Down, 3: Left
         direction = cur_agent[2]
-        self.draw_all_direction(self.subFrame3c2, 102, 187)
+        self.draw_all_direction(self.subFrame3c2, 102, 267)
         if direction == 0:
-            self.draw_up(self.subFrame3c2, 102, 187, color = 'red')
+            self.draw_up(self.subFrame3c2, 102, 267, color = 'red')
         elif direction == 1:
-            self.draw_right(self.subFrame3c2, 102, 187, color = 'red')       
+            self.draw_right(self.subFrame3c2, 102, 267, color = 'red')       
         elif direction == 2:
-            self.draw_down(self.subFrame3c2, 102, 187, color = 'red')
+            self.draw_down(self.subFrame3c2, 102, 267, color = 'red')
         elif direction == 3:
-            self.draw_left(self.subFrame3c2, 102, 187, color = 'red')
+            self.draw_left(self.subFrame3c2, 102, 267, color = 'red')
 
         if len(self.listCells) <= 1:
             kwargs[1].pack(pady = (5, 5))
@@ -576,15 +583,15 @@ class SystemGUI():
         self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width=15)
 
         direction = cur_agent[2]
-        self.draw_all_direction(self.subFrame3c2, 102, 187)
+        self.draw_all_direction(self.subFrame3c2, 102, 267)
         if direction == 0:
-            self.draw_up(self.subFrame3c2, 102, 187, color = 'red')
+            self.draw_up(self.subFrame3c2, 102, 267, color = 'red')
         elif direction == 1:
-            self.draw_right(self.subFrame3c2, 102, 187, color = 'red')       
+            self.draw_right(self.subFrame3c2, 102, 267, color = 'red')       
         elif direction == 2:
-            self.draw_down(self.subFrame3c2, 102, 187, color = 'red')
+            self.draw_down(self.subFrame3c2, 102, 267, color = 'red')
         elif direction == 3:
-            self.draw_left(self.subFrame3c2, 102, 187, color = 'red')
+            self.draw_left(self.subFrame3c2, 102, 267, color = 'red')
 
         if not isAuto:
             if not len(self.listCells) == 0:
