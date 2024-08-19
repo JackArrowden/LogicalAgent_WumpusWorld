@@ -178,6 +178,7 @@ class GUIProgram:
         self.agentHealth = 100
         self.numPotion = 0
         self.isSound = False
+        self.totalWumpus = 0
         
         self.isGameWin = False
         self.gameScore = 0
@@ -219,6 +220,7 @@ class GUIProgram:
         self.agentHealth = 100
         self.numPotion = 0
         self.isSound = False
+        self.totalWumpus = sum(self.dictNumWumpus[num] for num in self.dictNumWumpus)
         
         self.isGameWin = False
         self.gameScore = 0
@@ -409,9 +411,13 @@ def getAllElements(program):
                 
     return result
         
+def getNumDeadWumpus(program):
+    return program.totalWumpus - sum(program.dictNumWumpus[num] for num in program.dictNumWumpus)
+        
 if __name__ == "__main__":
     ABC = GUIProgram()
     ABC.getMap('test.txt')
+    # print(getNumDeadWumpus(ABC))
     # ABC.handleNextAction('turn right', (0, 0))
     # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
     # ABC.handleNextAction('move forward', (0, 0))
