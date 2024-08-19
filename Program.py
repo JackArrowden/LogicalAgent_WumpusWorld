@@ -146,7 +146,7 @@ class Program:
             self.isSound = True
     
     def handleClimb(self):
-        self.gameScore -= 10
+        self.gameScore += 10
         if self.x == 0 and self.y == 0:
             self.isGameWin = True
     
@@ -248,7 +248,7 @@ class GUIProgram:
             "turn left": lambda: self.handlePrevTurn(False),
             "turn right": lambda: self.handlePrevTurn(True)
         }
-        # print('dir', self.direction, 'coor', self.x, self.y, action)
+        # print('prevdir', self.direction, 'coor', self.x, self.y, action)
         if dictAction[action] != None:
             dictAction[action]()
         else:
@@ -273,7 +273,7 @@ class GUIProgram:
             "turn left": lambda: self.handleNextTurn(False),
             "turn right": lambda: self.handleNextTurn(True)
         }
-        # print('dir', self.direction, 'coor', self.x, self.y, action)
+        # print('nextdir', self.direction, 'coor', self.x, self.y, action)
         if dictAction[action] != None:
             dictAction[action]()
         else:
@@ -347,12 +347,12 @@ class GUIProgram:
             self.isSound = True
 
     def handlePrevClimb(self):
-        self.gameScore += 10
+        self.gameScore -= 10
         if self.x == 9 and self.y == 0:
             self.isGameWin = False
     
     def handleNextClimb(self):
-        self.gameScore -= 10
+        self.gameScore += 10
         if self.x == 9 and self.y == 0:
             self.isGameWin = True
     
