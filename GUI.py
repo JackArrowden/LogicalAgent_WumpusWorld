@@ -17,7 +17,6 @@ class SystemGUI():
         self.default_text = "Enter input file..."
         self.text1 = "The file's name must not be left blank!"
         self.text2 = "An error occur while opening input file\nPlease enter another file's name..."
-        # self.root.protocol("WM_DELETE_WINDOW", self.exit)
             
         self.width = 0
         self.height = 0
@@ -30,12 +29,6 @@ class SystemGUI():
 
         self.fileName = ""
         self.idAfter = set()
-        self.map = [[0]]
-        self.isSolvable = True
-        
-        self.isHead = True
-        self.isTail = False
-        self.isResetList = True
         
         self.curNumState = 0
         self.listCells = []
@@ -47,14 +40,64 @@ class SystemGUI():
         self.frame1 = tk.Frame(self.root)
         self.frame2 = tk.Frame(self.root)
         self.frame3 = tk.Frame(self.root)
-        # self.frame4 = tk.Frame(self.root)
-        # self.frame5 = tk.Frame(self.root)
         
         self.autoRunTime = [1, {1: 1000, 2: 600, 3: 400, 4: 200, 5: 100}]
-        self.images= []
+        self.images = []
         
         self.showFrame1()
+    
+    def resetAllContent(self):
+        self.HP = 100
+        self.idAfter = set()
+        
+        self.curNumState = 0
+        self.listCells = []
+        self.listRemainCells = []
+        self.tempCells = []
+        self.tempRemainCells = []
+        self.isNext = True
+        
+        self.autoRunTime = [1, {1: 1000, 2: 600, 3: 400, 4: 200, 5: 100}]
+        self.images = []
+    
+    ### Functions for pre-processing all frames
+    ### <<<=========================
+    def showFrame1(self):
+        self.unshowAllFrames()
+        self.root.title("Wumpus world")
+        self.frame1.pack(expand=True, anchor='center') 
+        self.clearFrame(self.frame1)  
+        self.mainFrame()
 
+    def showFrame2(self):
+        for after_id in self.idAfter:
+            self.root.after_cancel(after_id)
+        self.idAfter.clear()
+
+        self.unshowAllFrames()
+        self.root.title("Choose view frame")
+        self.frame2.pack(expand=True, anchor='center')  
+        self.clearFrame(self.frame2) 
+        
+        self.program.getMap(f"{self.fileName}.txt")
+        self.chooseViewFrame()
+
+    def showFrame3(self, isAuto = False):
+        self.unshowAllFrames()
+        self.root.title("Step by step")
+        self.frame3.pack(expand=True, anchor='center')
+        self.clearFrame(self.frame3)  
+        
+        self.moveContent(self.listCells, self.listRemainCells)
+        self.move1Item(self.listRemainCells, self.listCells)
+        
+        self.program.handleNextAction(self.listCells[0][1], self.listCells[0][0])
+
+        self.curNumState = 0
+        self.stepByStepFrame(isAuto)
+    ### =========================>>>
+
+    ### Content frame 1
     def mainFrame(self): #### Frame 1  
         ## Input frame
         self.entry = tk.Text(self.frame1, fg = "gray", width = 50, height = 2, padx = 10, bg = "white", highlightbackground = "#2F4F4F")
@@ -73,188 +116,13 @@ class SystemGUI():
         self.enterBtn = tk.Button(self.subFrame, text = "Enter", command = self.getFileName, bg = "#323232", fg = "#FAFAFA", width = 40, height = 2, cursor = "hand2")
         self.enterBtn.pack(pady = (5, 10))
 
-        # self.subFrame.focus_set()
         ## Exit button
         self.exitBtn1 = tk.Button(self.subFrame, text = "Exit", command = self.exit, bg = "#323232", fg = "#FAFAFA", width = 40, height = 2, cursor = "hand2")
         self.exitBtn1.pack(pady = (5, 10))
 
-    def entryOnFocus(self, event):
-        if self.entry.get("1.0", tk.END).strip() == self.default_text:
-            self.entry.delete("1.0", tk.END)
-
-    def entryOnBlur(self, event):
-        if self.entry.get("1.0", tk.END).strip() == "":
-            self.entry.insert("1.0", self.default_text)
-        else:
-            self.entry.delete("1.0", tk.END)
-                
-    def resetText(self, event):
-        if event.keysym == 'BackSpace' and len(self.entry.get("1.0", tk.END).strip()) == 1:
-            self.entry.delete("1.0", tk.END)
-            self.entry.insert("1.0", self.default_text)
-            self.entry.mark_set("insert", "1.0")
-        elif self.entry.get("1.0", tk.END).strip() == self.default_text or self.entry.get("1.0", tk.END).strip() == self.text1 or self.entry.get("1.0", tk.END).strip() == self.text2:
-            self.entry.delete("1.0", tk.END)
-    
-    def resetAllContent(self):
-        self.HP = 100
-
-        self.idAfter = set()
-        self.map = [[0]]
-        self.isSolvable = True
-        
-        self.isHead = True
-        self.isTail = False
-        self.isResetList = True
-        
-        self.curNumState = 0
-        self.listCells = []
-        self.listRemainCells = []
-        self.tempCells = []
-        self.tempRemainCells = []
-        self.isNext = True
-        
-        self.autoRunTime = [1, {1: 1000, 2: 600, 3: 400, 4: 200, 5: 100}]
-        self.images = []
-    
-    def getFileName(self):
-        self.fileName = self.entry.get("1.0", tk.END).strip()
-
-        if self.fileName == "" or self.fileName == self.default_text or self.fileName == self.text1 or self.fileName == self.text2:
-            self.entry.delete("1.0", tk.END)
-            self.entry.insert("1.0", self.text1)
-            self.entry.mark_set("insert", "1.0")
-        elif file.checkOpenFile(f"{self.fileName}.txt") == False:
-            self.entry.delete("1.0", tk.END)
-            self.entry.insert("1.0", self.text2)  
-            self.entry.mark_set("insert", "1.0")
-        else:
-            _ = self.resetAllContent()
-            environment = Program(f"{self.fileName}.txt")
-            agent = Agent()
-            agent.init(environment)
-            file.writeF(f"{self.fileName}_result.txt", agent.explore_world())
-            self.program.getMap(f"{self.fileName}.txt")
-            self.listRemainCells = file.readOutputFile(f"{self.fileName}_result.txt")
-            self.showFrame2()
-    
-    def clearFrame(self, frame):
-        for widget in frame.winfo_children():
-            try:
-                widget.destroy()
-            except tk.TclError as e:
-                pass
-
-    def unshowAllFrames(self):
-        self.frame1.pack_forget()
-        self.frame2.pack_forget()
-        self.frame3.pack_forget()
-        # self.frame4.pack_forget()
-        # self.frame5.pack_forget()
-
-    def showFrame1(self):
-        self.isResetList = True
-        self.unshowAllFrames()
-        self.root.title("Wumpus world")
-        self.frame1.pack(expand=True, anchor='center') 
-        self.clearFrame(self.frame1)  
-        self.mainFrame()
-
-    def create_grid(self,canvas, rows, cols, cell_size):
-        for i in range(rows):
-            for j in range(cols):
-                x1 = j * cell_size
-                y1 = i * cell_size
-                x2 = x1 + cell_size
-                y2 = y1 + cell_size
-                canvas.create_rectangle(x1, y1, x2, y2, fill="#CCCCCC", outline="black")
-
-        for cell in self.listCells:
-            canvas.create_rectangle(cell[0][1]*cell_size, cell[0][0]*cell_size, (cell[0][1]+1)*cell_size, (cell[0][0]+1)*cell_size, fill="white", outline="black")
-
-        hht = rows * cell_size
-        wth = cols * cell_size
-
-        canvas.create_line([(2, 0), (2, hht)], fill='black')
-        canvas.create_line([(wth, 0), (wth, hht)], fill='black')
-        canvas.create_line([(0, 2), (wth, 2)], fill='black')
-        canvas.create_line([(0, hht), (wth, hht)], fill='black')
-
-    def add_image(self,canvas, image_path, row=0, col=0, image_size=65, x=0, y=0 ):
-        image = Image.open(image_path)
-        image = image.resize((image_size, image_size), Image.Resampling.LANCZOS)
-        
-        photo = ImageTk.PhotoImage(image)
-        self.images.append(photo)  
-
-        x = col * self.cell_size + x
-        y = row * self.cell_size + y
-        canvas.create_image(x, y, anchor='nw', image=photo)
-        canvas.image = photo
-
-    def draw_dot(self, canvas, row, col, color="red", radius=10, m = 10, n=10):
-        x = col * self.cell_size + m
-        y = row * self.cell_size + n
-
-        # Calculate the coordinates for the circle
-        x1 = x - radius
-        y1 = y - radius
-        x2 = x + radius
-        y2 = y + radius
-
-        # Draw the circle
-        canvas.create_oval(x1, y1, x2, y2, fill=color, outline=color)
-    
-    def drawElements(self, canvas):
-        TEXT = ["W", 'P', 'G', 'H', 'T']
-        for i in range(10):
-            for j in range(10):
-                for k in range(5):
-                    if self.mapElements[i][j][k]:
-                        x = j*self.cell_size +  29 + (23 if k%2 else 0)
-                        y = i*self.cell_size + 12 +(20* int(k/2)) 
-                        canvas.create_text(x, y,  text=TEXT[k], font=("Arial", 15), fill="Red")
-    
-    def drawPercepts(self, canvas):  
-        color = ["#3CB371","#8EE5EE","#8E388E","#FFF68F"] #  stench, breeze,whiff, glow 
-        for i in range(10):
-            for j in range(10):
-                N = 10
-                for k in range(4):
-                    if self.mapPercepts[i][j][k]:
-                        self.draw_dot(canvas, i, j, color[k], radius = 5.5, m = 9, n=N)
-                    N +=15
-    
-    def draw_map(self, canvas):
-        self.mapPercepts = getAllPercepts(self.program)
-        self.mapElements = getAllElements(self.program)
-        self.create_grid(canvas, self.row, self.col, self.cell_size)
-        self.drawPercepts(canvas)
-        self.drawElements(canvas)
-
-        curPos = self.listCells[len(self.listCells)-1]
-        self.add_image(canvas, "GUI_imagine/agent.png", curPos[0][0], curPos[0][1], 18, 41, 44)
-
-    def draw_HP(self, canvas, x, y, size, HP = 100, width = 10):
-        len = float(size / 100)
-        
-        color = ""
-        if HP >75: color = "green"
-        elif HP >50: color = "yellow"
-        elif HP >25: color ="orange" 
-        else: color ="red"  
-
-        canvas.create_line(x, y, x + size, y, fill='white', width=width)
-        canvas.create_line(x, y, x + len * HP, y, fill=color, width=width)
-
-        for i in range (1,5):
-            x1 = x - 1
-            x2 = x + 25*i *len
-            y1 = y - width/2
-            y2 = y + width/2
-            canvas.create_rectangle(x1, y1, x2, y2, fill="", outline="black")
-
+    ### Content frame 2
     def chooseViewFrame(self):
+        ### Frame 2 a
         self.subFrame2a = tk.Frame(self.frame2)
         self.subFrame2a.pack(expand=True, anchor='center', pady = (0, 80)) 
 
@@ -266,7 +134,7 @@ class SystemGUI():
         self.stepByStepAutoBtn = tk.Button(self.subFrame2a, text = "Show step by step automatically", command = lambda: self.showFrame3(True), bg = "#323232", fg = "#FAFAFA", width = 40, height = 2, cursor = "hand2")
         self.stepByStepAutoBtn.pack(pady = (10, 10))
 
-        ### Frame b
+        ### Frame 2 b
         self.subFrame2b = tk.Frame(self.frame2)
         self.subFrame2b.pack(expand=True, anchor='center', pady = (20, 0)) 
             
@@ -278,140 +146,8 @@ class SystemGUI():
         self.exitBtn2 = tk.Button(self.subFrame2b, text = "Exit", command = self.exit, bg = "#323232", fg = "#FAFAFA", width = 25, height = 2, cursor = "hand2")
         self.exitBtn2.pack(side = tk.LEFT, pady = (10, 10), padx = (30, 0))
 
-    def moveContent(self, listA, listB):
-        while listA:
-            cur = listA.pop()
-            listB.insert(0, cur)
-            
-    def moveContentRev(self, listA, listB):
-        while listA:
-            cur = listA.pop(0)
-            listB.append(cur)
-    
-    def move2DContent(self, listA, listB):
-        listLen = len(listA)
-        for index in range(listLen):
-            self.moveContent(listA[index], listB[index])
-
-    def showFrame2(self):
-        for after_id in self.idAfter:
-            self.root.after_cancel(after_id)
-        self.idAfter.clear()
-        
-        self.program.getMap(f"{self.fileName}.txt")
-
-        self.isResetList = True
-        self.isHead = True
-        self.isTail = False
-        self.unshowAllFrames()
-        self.root.title("Choose view frame")
-        self.frame2.pack(expand=True, anchor='center')  
-        self.clearFrame(self.frame2) 
-        self.program.getMap(f"{self.fileName}.txt")
-        self.program.agentHealth = 100
-        self.chooseViewFrame()
-
-    def showFrame3(self, isAuto = False):
-        self.unshowAllFrames()
-        self.root.title("Step by step")
-        self.frame3.pack(expand=True, anchor='center')
-        
-        self.moveContent(self.listCells, self.listRemainCells)
-        self.move1Item(self.listRemainCells, self.listCells)
-        
-        self.program.handleNextAction(self.listCells[0][1], self.listCells[0][0])
-
-        self.clearFrame(self.frame3)  
-        self.curNumState = 0
-        self.stepByStepFrame(isAuto)
-
-    def draw_up(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):
-        canvas.create_line(x, y, x, y - 50, fill=color, width=line_width)
-        canvas.create_polygon(x, y - 50 - 4, x - arrow_size, y - 50 + arrow_size, x + arrow_size, y - 50 + arrow_size, fill=color)
-
-    def draw_down(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):       
-        canvas.create_line(x, y, x, y + 50, fill=color, width=line_width)
-        canvas.create_polygon(x, y + 50 + 4, x - arrow_size, y + 50 - arrow_size, x + arrow_size, y + 50 - arrow_size, fill=color)  
-
-    def draw_left(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):
-        canvas.create_line(x, y, x - 50, y, fill=color, width=line_width)
-        canvas.create_polygon(x - 50 - 4, y, x - 50 + arrow_size, y - arrow_size, x - 50 + arrow_size, y + arrow_size, fill=color)
-
-    def draw_right(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):
-        canvas.create_line(x, y, x + 50, y, fill=color, width=line_width)
-        canvas.create_polygon(x + 50 + 4, y, x + 50 - arrow_size, y - arrow_size, x + 50 - arrow_size, y + arrow_size, fill=color)
-
-    def getTotalScore(self):
-        self.score = 0
-        scoreDict = {
-            'move forward': -10,
-            'turn left': -10,
-            'turn right': -10,
-            'shoot': -100,
-            'climb': 10,
-            'heal': -10,
-            'grab': -10
-        }
-        self.score += getNumGold(self.program) * 5000
-        for index, action in enumerate(self.listCells):
-            if index != len(self.listCells) - 1:
-                self.score += scoreDict[action[1]]
-
-    # 0: Up, 1: Right, 2: Down, 3: Left
-    def draw_all_direction(self, canvas, x, y, color = "lightblue"):
-        self.draw_up(canvas, x, y, color=color)
-        self.draw_down(canvas, x, y, color=color)
-        self.draw_left(canvas, x, y, color=color)
-        self.draw_right(canvas, x, y, color=color)
-
-    def add_Healing_potion(self,canvas, image_size = 30, x=0, y=0, quantity = 6):
-        image_path = "GUI_imagine/Healing_potion.png"
-        image = Image.open(image_path)
-
-        original_width, original_height = image.size
-
-        scale_factor = image_size
-
-        new_width = int(original_width * scale_factor)
-        new_height = int(original_height * scale_factor)
-
-        resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
-        
-        photo = ImageTk.PhotoImage(resized_image)
-        self.images.append(photo)  
-
-        canvas.create_image(x , y, anchor='nw', image=photo)
-        canvas.image = photo
-    
-        canvas.create_text( x + 19, y + new_height - 33, text = f" x {quantity} ", font=("Arial", 15), fill="Red", anchor ='nw')
-
-    def add_Wumpus_Kill(self,canvas, image_size = 30, x=0, y=0, quantity = 6):
-        image_path = "GUI_imagine/wumpus.png"
-        image = Image.open(image_path)
-
-        original_width, original_height = image.size
-
-        scale_factor = image_size
-
-        new_width = int(original_width * scale_factor)
-        new_height = int(original_height * scale_factor)
-
-        resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
-        
-        photo = ImageTk.PhotoImage(resized_image)
-        self.images.append(photo)  
-
-        canvas.create_image(x , y, anchor='nw', image=photo)
-        canvas.image = photo
-    
-        canvas.create_text( x + 47, y + new_height - 36, text = f" x {quantity} ", font=("Arial", 15), fill="Red", anchor ='nw')
-
-    def stepByStepFrame(self, isAuto): #### Frame 3        
-        # if self.isResetList:
-        #     self.isResetList = False
-        #     self.move2DContent(self.listCells, self.listRemainCells)
-        #     # self.move1Item(self.listRemainCells, self.listCells)
-
+    ### Content frame 3
+    def stepByStepFrame(self, isAuto): #### Frame 3  
         self.width = self.cell_size * self.col
         self.height = self.cell_size * self.row
         self.edge = self.cell_size
@@ -443,6 +179,7 @@ class SystemGUI():
             self.nextBtn1 = tk.Button(self.subFrame3a, state = "disabled", text = "Next", bg = "lightgray", fg = "white", width = 20, height = 2)
             self.nextBtn2 = tk.Button(self.subFrame3a, text = "Next", command = lambda: self.nextMap(isAuto = False, kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.subFrame3c1, self.subFrame3c2]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
             self.nextBtn2.pack(pady = (5, 5))
+            
             def on_next_press(event):
                 self.nextBtn1.invoke()
                 self.nextBtn2.invoke()
@@ -468,7 +205,6 @@ class SystemGUI():
                 self.speedUp1.pack(pady = (5, 5))  
             else:
                 self.speedUp2.pack(pady = (5, 5))  
-            
         
         ### Sub frame 3 b
         self.subFrame3b = tk.Canvas(self.frame3, bg = "white", width = self.width, height = self.height)
@@ -493,22 +229,19 @@ class SystemGUI():
         self.subFrame3c2.pack(anchor='center', padx = (25, 5))
 
         self.subFrame3c2.create_text(110, 20,  text="AGENT: ", font = self.font2, fill="Red")
-        self.subFrame3c2.create_text(30, 55,  text="HP: ", font =("Arial", 16), fill="Red")
+        self.subFrame3c2.create_text(30, 55,  text="HP: ", font = ("Arial", 16), fill="Red")
+        
         self.draw_HP(self.subFrame3c2, 10, 78, 190, HP = self.program.agentHealth, width = 15)
-
         self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
-        # self.add_Healing_potion(self.subFrame3c2, 0.12, 10, 95, 100)
-
         self.add_Wumpus_Kill(self.subFrame3c2, 0.27, 100, 95, getNumDeadWumpus(self.program))
-        # self.add_Wumpus_Kill(self.subFrame3c2, 0.27, 95, 95, 100)
 
-        self.subFrame3c2.create_text(50, 165, text="Scores: ", font =("Arial", 16), fill="Red")
         _ = self.getTotalScore()
+        self.subFrame3c2.create_text(50, 165, text="Scores: ", font =("Arial", 16), fill="Red")
         self.subFrame3c2.create_text(135, 165, text=f"{self.score}", font =("Arial", 18), fill="Red")
-
         self.subFrame3c2.create_text(60, 198,  text="Direction: ", font =("Arial", 16), fill="Red")
+        
         # 0: Up, 1: Right, 2: Down, 3: Left
-        direction = self.listCells[len(self.listCells)-1][2]
+        direction = self.listCells[len(self.listCells) - 1][2]
         self.draw_all_direction(self.subFrame3c2, 102, 267)
         if direction == 0:
             self.draw_up(self.subFrame3c2, 102, 267, color = 'red')
@@ -580,7 +313,262 @@ class SystemGUI():
         if isAuto:
             curID = self.root.after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = [self.subFrame3b, self.subFrame3a, self.subFrame3c1]))
             self.idAfter.add(curID)
+    
+    def getFileName(self):
+        self.fileName = self.entry.get("1.0", tk.END).strip()
 
+        if self.fileName == "" or self.fileName == self.default_text or self.fileName == self.text1 or self.fileName == self.text2:
+            self.entry.delete("1.0", tk.END)
+            self.entry.insert("1.0", self.text1)
+            self.entry.mark_set("insert", "1.0")
+        elif file.checkOpenFile(f"{self.fileName}.txt") == False:
+            self.entry.delete("1.0", tk.END)
+            self.entry.insert("1.0", self.text2)  
+            self.entry.mark_set("insert", "1.0")
+        else:
+            _ = self.resetAllContent()
+            environment = Program(f"{self.fileName}.txt")
+            agent = Agent()
+            agent.init(environment)
+            file.writeF(f"{self.fileName}_result.txt", agent.explore_world())
+            
+            self.program.getMap(f"{self.fileName}.txt")
+            self.listRemainCells = file.readOutputFile(f"{self.fileName}_result.txt")
+            self.showFrame2()
+    
+    def entryOnFocus(self, event):
+        if self.entry.get("1.0", tk.END).strip() == self.default_text:
+            self.entry.delete("1.0", tk.END)
+
+    def entryOnBlur(self, event):
+        if self.entry.get("1.0", tk.END).strip() == "":
+            self.entry.insert("1.0", self.default_text)
+        else:
+            self.entry.delete("1.0", tk.END)
+                
+    def resetText(self, event):
+        if event.keysym == 'BackSpace' and len(self.entry.get("1.0", tk.END).strip()) == 1:
+            self.entry.delete("1.0", tk.END)
+            self.entry.insert("1.0", self.default_text)
+            self.entry.mark_set("insert", "1.0")
+        elif self.entry.get("1.0", tk.END).strip() == self.default_text or self.entry.get("1.0", tk.END).strip() == self.text1 or self.entry.get("1.0", tk.END).strip() == self.text2:
+            self.entry.delete("1.0", tk.END)
+
+    def clearFrame(self, frame):
+        for widget in frame.winfo_children():
+            try:
+                widget.destroy()
+            except tk.TclError as e:
+                pass
+
+    def unshowAllFrames(self):
+        self.frame1.pack_forget()
+        self.frame2.pack_forget()
+        self.frame3.pack_forget()
+
+    ### All necessary functions for drawing map
+    ### <<<=========================
+    def create_grid(self,canvas, rows, cols, cell_size):
+        for i in range(rows):
+            for j in range(cols):
+                x1 = j * cell_size
+                y1 = i * cell_size
+                x2 = x1 + cell_size
+                y2 = y1 + cell_size
+                canvas.create_rectangle(x1, y1, x2, y2, fill="#CCCCCC", outline="black")
+
+        for cell in self.listCells:
+            canvas.create_rectangle(cell[0][1]*cell_size, cell[0][0]*cell_size, (cell[0][1]+1)*cell_size, (cell[0][0]+1)*cell_size, fill="white", outline="black")
+
+        hht = rows * cell_size
+        wth = cols * cell_size
+
+        canvas.create_line([(2, 0), (2, hht)], fill='black')
+        canvas.create_line([(wth, 0), (wth, hht)], fill='black')
+        canvas.create_line([(0, 2), (wth, 2)], fill='black')
+        canvas.create_line([(0, hht), (wth, hht)], fill='black')
+
+    def add_image(self,canvas, image_path, row=0, col=0, image_size=65, x=0, y=0 ):
+        image = Image.open(image_path)
+        image = image.resize((image_size, image_size), Image.Resampling.LANCZOS)
+        
+        photo = ImageTk.PhotoImage(image)
+        self.images.append(photo)  
+
+        x = col * self.cell_size + x
+        y = row * self.cell_size + y
+        canvas.create_image(x, y, anchor='nw', image=photo)
+        canvas.image = photo
+
+    def draw_dot(self, canvas, row, col, color="red", radius=10, m = 10, n=10):
+        x = col * self.cell_size + m
+        y = row * self.cell_size + n
+
+        # Calculate the coordinates for the circle
+        x1 = x - radius
+        y1 = y - radius
+        x2 = x + radius
+        y2 = y + radius
+
+        # Draw the circle
+        canvas.create_oval(x1, y1, x2, y2, fill=color, outline=color)
+    
+    def drawElements(self, canvas):
+        TEXT = ["W", 'P', 'G', 'H', 'T']
+        for i in range(10):
+            for j in range(10):
+                for k in range(5):
+                    if self.mapElements[i][j][k]:
+                        x = j*self.cell_size +  29 + (23 if k%2 else 0)
+                        y = i*self.cell_size + 12 +(20* int(k/2)) 
+                        canvas.create_text(x, y,  text=TEXT[k], font=("Arial", 15), fill="Red")
+    
+    def drawPercepts(self, canvas):  
+        color = ["#3CB371","#8EE5EE","#8E388E","#FFF68F"] #  stench, breeze, whiff, glow 
+        for i in range(10):
+            for j in range(10):
+                N = 10
+                for k in range(4):
+                    if self.mapPercepts[i][j][k]:
+                        self.draw_dot(canvas, i, j, color[k], radius = 5.5, m = 9, n=N)
+                    N +=15
+    
+    def draw_map(self, canvas):
+        self.mapPercepts = getAllPercepts(self.program)
+        self.mapElements = getAllElements(self.program)
+        self.create_grid(canvas, self.row, self.col, self.cell_size)
+        self.drawPercepts(canvas)
+        self.drawElements(canvas)
+
+        curPos = self.listCells[len(self.listCells)-1]
+        self.add_image(canvas, "GUI_imagine/agent.png", curPos[0][0], curPos[0][1], 18, 41, 44)
+
+    def draw_HP(self, canvas, x, y, size, HP = 100, width = 10):
+        len = float(size / 100)
+        
+        color = ""
+        if HP >75: color = "green"
+        elif HP >50: color = "yellow"
+        elif HP >25: color ="orange" 
+        else: color ="red"  
+
+        canvas.create_line(x, y, x + size, y, fill='white', width=width)
+        canvas.create_line(x, y, x + len * HP, y, fill=color, width=width)
+
+        for i in range (1,5):
+            x1 = x - 1
+            x2 = x + 25*i *len
+            y1 = y - width/2
+            y2 = y + width/2
+            canvas.create_rectangle(x1, y1, x2, y2, fill="", outline="black")
+
+    def draw_up(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):
+        canvas.create_line(x, y, x, y - 50, fill=color, width=line_width)
+        canvas.create_polygon(x, y - 50 - 4, x - arrow_size, y - 50 + arrow_size, x + arrow_size, y - 50 + arrow_size, fill=color)
+
+    def draw_down(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):       
+        canvas.create_line(x, y, x, y + 50, fill=color, width=line_width)
+        canvas.create_polygon(x, y + 50 + 4, x - arrow_size, y + 50 - arrow_size, x + arrow_size, y + 50 - arrow_size, fill=color)  
+
+    def draw_left(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):
+        canvas.create_line(x, y, x - 50, y, fill=color, width=line_width)
+        canvas.create_polygon(x - 50 - 4, y, x - 50 + arrow_size, y - arrow_size, x - 50 + arrow_size, y + arrow_size, fill=color)
+
+    def draw_right(self, canvas, x, y, color = "lightblue",  arrow_size = 10, line_width = 7):
+        canvas.create_line(x, y, x + 50, y, fill=color, width=line_width)
+        canvas.create_polygon(x + 50 + 4, y, x + 50 - arrow_size, y - arrow_size, x + 50 - arrow_size, y + arrow_size, fill=color)
+
+    # 0: Up, 1: Right, 2: Down, 3: Left
+    def draw_all_direction(self, canvas, x, y, color = "lightblue"):
+        self.draw_up(canvas, x, y, color=color)
+        self.draw_down(canvas, x, y, color=color)
+        self.draw_left(canvas, x, y, color=color)
+        self.draw_right(canvas, x, y, color=color)
+
+    def add_Healing_potion(self,canvas, image_size = 30, x=0, y=0, quantity = 6):
+        image_path = "GUI_imagine/Healing_potion.png"
+        image = Image.open(image_path)
+
+        original_width, original_height = image.size
+
+        scale_factor = image_size
+
+        new_width = int(original_width * scale_factor)
+        new_height = int(original_height * scale_factor)
+
+        resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        photo = ImageTk.PhotoImage(resized_image)
+        self.images.append(photo)  
+
+        canvas.create_image(x , y, anchor='nw', image=photo)
+        canvas.image = photo
+    
+        canvas.create_text( x + 19, y + new_height - 33, text = f" x {quantity} ", font=("Arial", 15), fill="Red", anchor ='nw')
+
+    def add_Wumpus_Kill(self,canvas, image_size = 30, x=0, y=0, quantity = 6):
+        image_path = "GUI_imagine/wumpus.png"
+        image = Image.open(image_path)
+
+        original_width, original_height = image.size
+
+        scale_factor = image_size
+
+        new_width = int(original_width * scale_factor)
+        new_height = int(original_height * scale_factor)
+
+        resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        photo = ImageTk.PhotoImage(resized_image)
+        self.images.append(photo)  
+
+        canvas.create_image(x , y, anchor='nw', image=photo)
+        canvas.image = photo
+    
+        canvas.create_text( x + 47, y + new_height - 36, text = f" x {quantity} ", font=("Arial", 15), fill="Red", anchor ='nw')
+
+    def add_You_won(self,canvas, image_size = 1, x=0, y=0):
+        image_path = "GUI_imagine/You_won.png"
+        image = Image.open(image_path)
+
+        original_width, original_height = image.size
+
+        scale_factor = image_size
+
+        new_width = int(original_width * scale_factor)
+        new_height = int(original_height * scale_factor)
+
+        resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        photo = ImageTk.PhotoImage(resized_image)
+        self.images.append(photo)  
+
+        canvas.create_image(x , y, anchor='nw', image=photo)
+        canvas.image = photo
+
+    def clearCanvas(self, canvas):
+        for item in canvas.find_all():
+            canvas.delete(item)
+    ### =========================>>>
+
+    def getTotalScore(self):
+        self.score = 0
+        scoreDict = {
+            'move forward': -10,
+            'turn left': -10,
+            'turn right': -10,
+            'shoot': -100,
+            'climb': 10,
+            'heal': -10,
+            'grab': -10
+        }
+        self.score += getNumGold(self.program) * 5000
+        for index, action in enumerate(self.listCells):
+            if index != len(self.listCells) - 1:
+                self.score += scoreDict[action[1]]
+
+    ### Frame 2: Functions for processing all changable buttons
+    ### <<<=========================
     def prevMap(self, kwargs = []):
         self.curNumState = self.curNumState - 1
         curStep = "Iteration: " + str(self.curNumState)
@@ -655,7 +643,37 @@ class SystemGUI():
             kwargs[3].pack_forget()
             kwargs[4].pack_forget()
             kwargs[3].pack(pady = (5, 5))
-            
+
+    def slowDownFunc(self, kwargs = []):
+        if self.autoRunTime[0] > 1:
+            self.autoRunTime[0] = self.autoRunTime[0] - 1
+        if self.autoRunTime[0] == 1:
+            kwargs[0].pack_forget()
+            kwargs[1].pack(pady = (5, 5))  
+        if self.autoRunTime[0] != len(self.autoRunTime[1]):
+            kwargs[2].pack_forget()
+            kwargs[3].pack_forget()
+            kwargs[2].pack(pady = (5, 5))  
+        else:
+            kwargs[2].pack_forget()
+            kwargs[3].pack_forget()
+            kwargs[3].pack(pady = (5, 5))    
+    
+    def speedUpFunc(self, kwargs = []):
+        if self.autoRunTime[0] < len(self.autoRunTime[1]):
+            self.autoRunTime[0] = self.autoRunTime[0] + 1
+        if self.autoRunTime[0] != 1:
+            kwargs[1].pack_forget()
+            kwargs[0].pack(pady = (5, 5))  
+        if self.autoRunTime[0] == len(self.autoRunTime[1]):
+            kwargs[2].pack_forget()
+            kwargs[3].pack_forget() 
+            kwargs[3].pack(pady = (5, 5)) 
+        else:
+            kwargs[2].pack_forget()
+            kwargs[3].pack_forget() 
+            kwargs[2].pack(pady = (5, 5)) 
+ 
     def nextMap(self, isAuto = False, kwargs = []):
         self.curNumState = self.curNumState + 1
         curStep = "Iteration: " + str(self.curNumState)
@@ -666,7 +684,6 @@ class SystemGUI():
             self.clearCanvas(kwargs[5])
             kwargs[5].create_text(110, 22, text = curStep, fill = "black", font = self.font2)
         
-        # cur = (0, 0)
         if len(self.listRemainCells) > 0:
             cur = self.listRemainCells.pop(0)
             self.listCells.append(cur)
@@ -754,63 +771,19 @@ class SystemGUI():
                 temp = kwargs
                 curid = kwargs[1].after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = temp))
                 self.idAfter.add(curid)
+    ### =========================>>>
 
-    def add_You_won(self,canvas, image_size = 1, x=0, y=0):
-        image_path = "GUI_imagine/You_won.png"
-        image = Image.open(image_path)
-
-        original_width, original_height = image.size
-
-        scale_factor = image_size
-
-        new_width = int(original_width * scale_factor)
-        new_height = int(original_height * scale_factor)
-
-        resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
-        
-        photo = ImageTk.PhotoImage(resized_image)
-        self.images.append(photo)  
-
-        canvas.create_image(x , y, anchor='nw', image=photo)
-        canvas.image = photo
-
-    def clearCanvas(self, canvas):
-        for item in canvas.find_all():
-            canvas.delete(item)
-
+    ### Functions for copying content
+    ### <<<=========================
+    def moveContent(self, listA, listB):
+        while listA:
+            cur = listA.pop()
+            listB.insert(0, cur)
+   
     def move1Item(self, listA, listB):
         listB.append(listA.pop(0))
+    ### =========================>>>
     
-    def slowDownFunc(self, kwargs = []):
-        if self.autoRunTime[0] > 1:
-            self.autoRunTime[0] = self.autoRunTime[0] - 1
-        if self.autoRunTime[0] == 1:
-            kwargs[0].pack_forget()
-            kwargs[1].pack(pady = (5, 5))  
-        if self.autoRunTime[0] != len(self.autoRunTime[1]):
-            kwargs[2].pack_forget()
-            kwargs[3].pack_forget()
-            kwargs[2].pack(pady = (5, 5))  
-        else:
-            kwargs[2].pack_forget()
-            kwargs[3].pack_forget()
-            kwargs[3].pack(pady = (5, 5))    
-    
-    def speedUpFunc(self, kwargs = []):
-        if self.autoRunTime[0] < len(self.autoRunTime[1]):
-            self.autoRunTime[0] = self.autoRunTime[0] + 1
-        if self.autoRunTime[0] != 1:
-            kwargs[1].pack_forget()
-            kwargs[0].pack(pady = (5, 5))  
-        if self.autoRunTime[0] == len(self.autoRunTime[1]):
-            kwargs[2].pack_forget()
-            kwargs[3].pack_forget() 
-            kwargs[3].pack(pady = (5, 5)) 
-        else:
-            kwargs[2].pack_forget()
-            kwargs[3].pack_forget() 
-            kwargs[2].pack(pady = (5, 5)) 
-
     def exit(self):
         try:
             self.root.destroy()

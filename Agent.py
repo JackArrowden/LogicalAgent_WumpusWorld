@@ -23,6 +23,30 @@ class Agent:
 
         self.taken_actions = []
 
+    def init(self, program: Program):
+        self.direction = 0
+        self.x = 0
+        self.y = 0
+        self.health = 4
+        self.num_healing_potion = 0
+
+        self.KB = KnowledgeBase()
+        self.percepts = {}
+        for x in range(10):
+            for y in range(10):
+                self.percepts[(x, y)] = CellPercept(x, y)
+        self.cost_escaping = dict()
+        self.candidate_cells = dict()
+
+        self.taken_actions = []
+
+        self.environment = program
+        self.percepts[(self.x, self.y)].update_percept(self.environment.getPercept())
+        self.percepts[(self.x, self.y)].update_visited()
+        self.update_KB()
+        self.update_escaping_cost()
+        self.analyze()
+        
     def infer_update_KB(self, x, y):
         if self.percepts[(x, y)].have_stench():
             self.KB.add_clause(stench_infer_exist_wumpus_clause(x, y))
@@ -87,12 +111,10 @@ class Agent:
             self.health = min(4, self.health + 1)
             self.num_healing_potion -= 1
 
-
     def infer(self, clause):
         if len(clause) == 1:
             x = (int(abs(clause[0]) - 1) % 100) // 10
             y = (int(abs(clause[0]) - 1) % 100) % 10
-            # print(clause, x, y)
             if self.percepts[(x, y)].is_true(clause[0]):
                 return True
         
@@ -193,7 +215,7 @@ class Agent:
             if not self.percepts[cell].check_visited():
                 unexpand_adj_cells.append(cell)
 
-        # get all cell that we can infer it doesn't have pit
+        # Get all cells that we can infer they don't have pit
         valid_unexpand_cells = []
         for cell in unexpand_adj_cells:
             clause = element_clause(cell[0], cell[1], Constants.PIT, True)
@@ -207,7 +229,7 @@ class Agent:
                 self.percepts[cell].update_percept(clause)
                 self.KB.update_unit_clause(clause)
 
-        # clear all wumpus
+        # Clear all Wumpus
         wumpus_cells = []
         for cell in valid_unexpand_cells:
             clause = element_clause(cell[0], cell[1], Constants.WUMPUS, True)
@@ -219,59 +241,29 @@ class Agent:
 
         self.clear_wumpus(wumpus_cells)
 
-        # insert all expand cells in to candidate list
+        # Insert all expand cells into candidate list
         for cell in valid_unexpand_cells:
             candidate = (0, 0)
             if self.infer(element_clause(cell[0], cell[1], Constants.HEAL)):
                 candidate = sum_cost(candidate, Constants.CERTAINLY_HEAL)
-                # print(cell, 'have_heal')
             elif self.infer(element_clause(cell[0], cell[1], Constants.HEAL, True)):
                 self.percepts[cell].update_percept(element_clause(cell[0], cell[1], Constants.HEAL, True))
                 self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.HEAL, True))
-                # print(cell, 'no have heal')
             else:
                 candidate = sum_cost(candidate, Constants.ABLE_HEAL)
-                # print(cell, 'may be have heal')
 
             if self.infer(element_clause(cell[0], cell[1], Constants.GAS)):
                 candidate = sum_cost(candidate, Constants.CERTAINLY_GAS)
                 self.percepts[cell].update_percept(element_clause(cell[0], cell[1], Constants.GAS))
                 self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.GAS))
-                # print(cell, 'have gas')
             elif self.infer(element_clause(cell[0], cell[1], Constants.GAS, True)):
                 self.percepts[cell].update_percept(element_clause(cell[0], cell[1], Constants.GAS, True))
                 self.KB.update_unit_clause(element_clause(cell[0], cell[1], Constants.GAS, True))
-                # print(cell, 'have no gas')            
             else:
                 candidate = sum_cost(candidate, Constants.ABLE_GAS)
-                # print(cell, 'may be have gas')
 
             self.candidate_cells[cell] = candidate
 
-    def init(self, program: Program):
-        self.direction = 0
-        self.x = 0
-        self.y = 0
-        self.health = 4
-        self.num_healing_potion = 0
-
-        self.KB = KnowledgeBase()
-        self.percepts = {}
-        for x in range(10):
-            for y in range(10):
-                self.percepts[(x, y)] = CellPercept(x, y)
-        self.cost_escaping = dict()
-        self.candidate_cells = dict()
-
-        self.taken_actions = []
-
-        self.environment = program
-        self.percepts[(self.x, self.y)].update_percept(self.environment.getPercept())
-        self.percepts[(self.x, self.y)].update_visited()
-        self.update_KB()
-        self.update_escaping_cost()
-        self.analyze()
-        
     def explore_world(self):
         while True:
             if not self.get_target_cell():
@@ -302,13 +294,3 @@ class Agent:
         self.get_target_cell()
         self.do('climb')
         return self.taken_actions
-
-
-if __name__ == '__main__':
-    program = Program('map_sample_multi_3.txt')
-    agent = Agent()
-    agent.init(program)
-    action = agent.explore_world()
-    print('-----------------')
-    for x in action:
-        print(x[0], x[1])

@@ -90,12 +90,6 @@ def exist_element_clause(x, y, element):
     return tuple(clause)
 
 def standardize_clause(clause):
-    """
-    Standardizes a CNF clause.
-    :param clause: A list of variables in the clause (positive or negative integers).
-    :return: The standardized clause as a sorted list of unique integers.
-    """
-
     temp_clause = set(clause)
     std_clause = {*{}}
     for it in temp_clause:
@@ -133,4 +127,3 @@ def not_clause(clause):
 
 def is_empty(clause):
     return True if len(clause) == 0 else False 
-

@@ -116,6 +116,7 @@ def UCS(problem: Problem):
         node = Node(state, None, None, cost)
         frontier.put((cost, node))
         reached[state] = node
+        
     while not frontier.empty():
         cost, node = frontier.get()
 
@@ -131,7 +132,6 @@ def UCS(problem: Problem):
                 frontier.put((child.path_cost, child))
     return None
 
-
 def sum_cost(cost1, cost2):
     if len(cost1) != len(cost2):
         raise ValueError("Hai tuple phải có cùng độ dài.")
@@ -143,6 +143,7 @@ def trace(last_node):
         return -1
     path = []
     node = last_node
+    
     while node is not None:
         if node.action is not None:
             path.append(node.action)

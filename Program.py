@@ -50,7 +50,7 @@ class Program:
         n = len(caveMap)
         for i in range(n):
             for j in range(n):
-                if caveMap[i][j] is None or caveMap[i][j] == 'A':
+                if caveMap[i][j] is None or 'A' in caveMap[i][j].split():
                     continue
                 
                 listEntities = caveMap[i][j].split()
@@ -154,13 +154,6 @@ class Program:
         if self.numPotion > 0:
             self.numPotion -= 1
             self.agentHealth = (self.agentHealth + 25) if self.agentHealth != 100 else 100
-    
-    def printPrg(self):
-        print("Gold", self.mapGold)
-        print("HP", self.mapHPotion)
-        print("PG", self.mapPGas)
-        print("Pit", self.mapPit)
-        print("Wumpus", self.mapWumpus)
         
 class GUIProgram:
     def __init__(self):
@@ -210,7 +203,7 @@ class GUIProgram:
         n = len(caveMap)
         for i in range(n):
             for j in range(n):
-                if caveMap[i][j] is None or caveMap[i][j] == 'A':
+                if caveMap[i][j] is None or 'A' in caveMap[i][j].split():
                     continue
                 
                 listEntities = caveMap[i][j].split()
@@ -255,7 +248,7 @@ class GUIProgram:
             "turn left": lambda: self.handlePrevTurn(False),
             "turn right": lambda: self.handlePrevTurn(True)
         }
-        # print('prevdir', self.direction, 'coor', self.x, self.y, action)
+        
         if dictAction[action] != None:
             dictAction[action]()
         else:
@@ -280,7 +273,7 @@ class GUIProgram:
             "turn left": lambda: self.handleNextTurn(False),
             "turn right": lambda: self.handleNextTurn(True)
         }
-        # print('nextdir', self.direction, 'coor', self.x, self.y, action)
+
         if dictAction[action] != None:
             dictAction[action]()
         else:
@@ -301,6 +294,7 @@ class GUIProgram:
     def handlePrevGrab(self):
         self.gameScore += 10
         nextStep = self.curStep + 1
+        
         if nextStep in self.listPickedHPotion:
             self.mapHPotion[self.x][self.y] = True
             self.numPotion -= 1
@@ -310,6 +304,7 @@ class GUIProgram:
         
     def handleNextGrab(self):
         self.gameScore -= 10
+        
         if self.mapHPotion[self.x][self.y] == True:
             self.mapHPotion[self.x][self.y] = False
             self.numPotion += 1
@@ -327,10 +322,8 @@ class GUIProgram:
                         [self.x, self.y - 1] if self.y != 0 else None]
         coorXY = coorDictNext[self.direction] 
         nextStep = self.curStep + 1
+        
         if nextStep in self.listKilledWumpus:
-            # print('dirrev', self.direction)
-            # print(self.dictNumWumpus)
-            # print(coorXY[0], coorXY[1])
             self.dictNumWumpus[(coorXY[0], coorXY[1])] += 1
             self.mapWumpus[coorXY[0]][coorXY[1]] = True
             
@@ -341,9 +334,8 @@ class GUIProgram:
                         [self.x + 1, self.y] if self.x != 0 else None, 
                         [self.x, self.y - 1] if self.y != 0 else None]
         coorXY = coorDictNext[self.direction] 
+        
         if coorXY is not None and self.mapWumpus[coorXY[0]][coorXY[1]] == True:
-            # print('dir', self.direction)
-            # print('next', self.dictNumWumpus)
             self.dictNumWumpus[(coorXY[0], coorXY[1])] -= 1
             self.listKilledWumpus[self.curStep] = [coorXY[0], coorXY[1]]
             
@@ -364,12 +356,14 @@ class GUIProgram:
     def handlePrevHeal(self):
         nextStep = self.curStep + 1
         self.gameScore += 10
+        
         if nextStep in self.listHealth:
             self.numPotion += 1
             self.agentHealth = self.agentHealth - 25
     
     def handleNextHeal(self):
         self.gameScore -= 10
+        
         if self.numPotion > 0:
             self.numPotion -= 1
             self.agentHealth = (self.agentHealth + 25) if self.agentHealth != 100 else 100
@@ -421,33 +415,3 @@ def getNumDeadWumpus(program):
      
 def getNumGold(program):
     return program.totalGold - sum(curList.count(True) for curList in program.mapGold)
-        
-if __name__ == "__main__":
-    ABC = GUIProgram()
-    ABC.getMap('test.txt')
-    # print(getNumGold(ABC))
-    # ABC.handleNextAction('turn right', (0, 0))
-    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
-    # ABC.handleNextAction('move forward', (0, 0))
-    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
-    # ABC.handleNextAction('move forward', (0, 1))
-    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
-    # ABC.handleNextAction('turn left', (0, 2))
-    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
-    # ABC.handleNextAction('move forward', (0, 2))
-    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
-    # ABC.handleNextAction('turn right', (1, 2))
-    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
-    # ABC.handleNextAction('shoot', (1, 2))
-    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
-    # ABC.handleNextAction('turn left', (1, 2))
-    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
-    # ABC.handleNextAction('move forward', (1, 2))
-    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
-    # ABC.handleNextAction('shoot', (2, 2))
-    # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
-    
-    
-    # print(getAllPercepts(ABC))
-    # print(getAllElements(ABC))
-    # print(getNextDir(3, [(1, 3), (2, 4), (3, 3), (2, 2)], 2, 3))

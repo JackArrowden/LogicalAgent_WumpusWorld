@@ -8,12 +8,6 @@ class KnowledgeBase:
         set()
 
     def add_clause(self, clause):
-        """
-        Adds a standardized clause to the knowledge base if it is not already present.
-
-        :param clause: A list of variables in the clause (positive or negative integers).
-        :return: True if the clause was added to the KB, False otherwise.
-        """
         clause = standardize_clause(clause)
         if clause not in self.KB:
             self.KB.add(clause)
@@ -21,12 +15,6 @@ class KnowledgeBase:
         return False
 
     def del_clause(self, clause):
-        """
-        Removes a standardized clause from the knowledge base if it is present.
-
-        :param clause: A list of variables in the clause (positive or negative integers).
-        :return: True if the clause was removed from the KB, False otherwise.
-        """
         clause = standardize_clause(clause)
         if clause in self.KB:
             self.KB.remove(clause)
@@ -41,11 +29,6 @@ class KnowledgeBase:
         return True
 
     def resolution(self, alpha):
-        """
-        try to prove KB entails alpha
-        :param alpha: A list of clause
-        :return: True if KB entails alpha, False for unknown
-        """
         alpha = standardize_clause(alpha)
         not_alpha = not_clause(alpha)
 
@@ -60,12 +43,3 @@ class KnowledgeBase:
         if sol:
             return False
         return True
-
-if __name__ == '__main__':
-    kb = KnowledgeBase()
-    l = [(-101,), (1001,), (-111,), (-201,), (-211,), (-301,), (-401,), (-102,), (-202,), (-501,), (-411,), (-601,), (-701,), (-801,)]
-    
-    for x in l:
-        kb.add_clause(x)
-    print(kb.resolution((901,)))
-    

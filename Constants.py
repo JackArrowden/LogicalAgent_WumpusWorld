@@ -21,4 +21,3 @@ class Constants:
     ABLE_HEAL: tuple = (-0.1, 0)
     NORMAL: tuple = (0, 0)
     VERIFY: tuple = (0, -4)
-

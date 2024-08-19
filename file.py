@@ -72,8 +72,3 @@ def readOutputFile(file):
             curFile.close()
             
     return listCells
-
-if __name__ == "__main__":
-    # print(readF('test.txt'))
-    # writeF('test2.txt', [[(1,1), "move forward"], [(1,2), "turn right"], [(1,2), "shoot"]])
-    print(readOutputFile('test2.txt'))

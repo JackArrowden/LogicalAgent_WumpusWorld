@@ -1,7 +1,6 @@
 from Constants import *
 from method import *
 
-
 class CellPercept:
     def __init__(self, x, y, raw_percepts = None, is_visited = False):
         self.x = x
@@ -90,14 +89,3 @@ class CellPercept:
     
     def is_true(self, percept):
         return percept in self.percepts
-    
-    # def to_clause(self):
-    #     clauses = []
-        
-    #     for percept in self.percepts:
-    #         clauses.append((tuple([])))
-    #         if is_signal_percept(percept):
-    #             clauses.append(signal_2_exist(self.x, self.y, percept))
-
-    #     return clauses
-
