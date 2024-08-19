@@ -146,10 +146,11 @@ class SystemGUI():
                 y1 = i * cell_size
                 x2 = x1 + cell_size
                 y2 = y1 + cell_size
-                canvas.create_rectangle(x1, y1, x2, y2, fill="white", outline="black")
+                # canvas.create_rectangle(x1, y1, x2, y2, fill="#CCCCCC", outline="black")
+                canvas.create_rectangle(x1, y1, x2, y2, fill="black", outline="black")
 
         for cell in self.listCells:
-            canvas.create_rectangle(cell[0][1]*cell_size, cell[0][0]*cell_size, (cell[0][1]+1)*cell_size, (cell[0][0]+1)*cell_size, fill="#BBBBBB", outline="black")
+            canvas.create_rectangle(cell[0][1]*cell_size, cell[0][0]*cell_size, (cell[0][1]+1)*cell_size, (cell[0][0]+1)*cell_size, fill="white", outline="black")
 
         hht = rows * cell_size
         wth = cols * cell_size
@@ -213,6 +214,7 @@ class SystemGUI():
         self.create_grid(canvas, self.row, self.col, self.cell_size)
         self.drawPercepts(canvas)
         self.drawElements(canvas)
+        
         curPos = self.listCells[len(self.listCells)-1]
         self.add_image(canvas, "asd.jpg", curPos[0][0], curPos[0][1], 18, 41, 44)
 
@@ -347,15 +349,10 @@ class SystemGUI():
         photo = ImageTk.PhotoImage(resized_image)
         self.images.append(photo)  
 
-        if quantity < 5: num_loop = quantity
-        else: num_loop = 5
-
-        for i in range(num_loop):
-            canvas.create_image(x +i*18, y, anchor='nw', image=photo)
-            canvas.image = photo
+        canvas.create_image(x , y, anchor='nw', image=photo)
+        canvas.image = photo
     
-        if quantity > 5:
-            canvas.create_text( x + 130, y + new_height - 25, text = f"+ {quantity - 5} ", font=("Arial", 23), fill="Red")
+        canvas.create_text( x + 130, y + new_height - 25, text = f"+ {quantity - 5} ", font=("Arial", 23), fill="Red")
 
     def stepByStepFrame(self, isAuto): #### Frame 3        
         # if self.isResetList:
@@ -531,7 +528,7 @@ class SystemGUI():
             
         self.clearCanvas(kwargs[0])
 
-        cur_agent = self.listCells[len(self.listCells)-1]
+        cur_agent = self.listRemainCells[0]
 
         self.program.handlePrevAction(cur_agent[1], cur_agent[0])
 
@@ -563,8 +560,8 @@ class SystemGUI():
             self.draw_left(self.subFrame3c2, 102, 267, color = 'red')
             y_soud -= 1
 
-        # if self.program.isSound:
-            # kwargs[0].create_text( y_soud*65, x_soud*65, text = "Grraaahh!", fill = "red", font = ('Blood Drip', 18, 'bold'), anchor='nw')
+        if self.program.isSound:
+            kwargs[0].create_text( y_soud*65, x_soud*65, text = "Grraaahh!", fill = "red", font = ('Blood Drip', 18, 'bold'), anchor='nw')
 
         if len(self.listCells) <= 1:
             kwargs[1].pack(pady = (5, 5))
