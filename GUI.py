@@ -96,6 +96,27 @@ class SystemGUI():
         elif self.entry.get("1.0", tk.END).strip() == self.default_text or self.entry.get("1.0", tk.END).strip() == self.text1 or self.entry.get("1.0", tk.END).strip() == self.text2:
             self.entry.delete("1.0", tk.END)
     
+    def resetAllContent(self):
+        self.HP = 100
+
+        self.idAfter = set()
+        self.map = [[0]]
+        self.isSolvable = True
+        
+        self.isHead = True
+        self.isTail = False
+        self.isResetList = True
+        
+        self.curNumState = 0
+        self.listCells = []
+        self.listRemainCells = []
+        self.tempCells = []
+        self.tempRemainCells = []
+        self.isNext = True
+        
+        self.autoRunTime = [1, {1: 1000, 2: 600, 3: 400, 4: 200, 5: 100}]
+        self.images = []
+    
     def getFileName(self):
         self.fileName = self.entry.get("1.0", tk.END).strip()
 
@@ -108,6 +129,7 @@ class SystemGUI():
             self.entry.insert("1.0", self.text2)  
             self.entry.mark_set("insert", "1.0")
         else:
+            _ = self.resetAllContent()
             environment = Program(f"{self.fileName}.txt")
             agent = Agent()
             agent.init(environment)
@@ -285,7 +307,8 @@ class SystemGUI():
         self.root.title("Choose view frame")
         self.frame2.pack(expand=True, anchor='center')  
         self.clearFrame(self.frame2) 
-        # self.move2DContent(self.listCells, self.listRemainCells)
+        self.program.getMap(f"{self.fileName}.txt")
+        self.program.agentHealth = 100
         self.chooseViewFrame()
 
     def showFrame3(self, isAuto = False):
@@ -297,8 +320,6 @@ class SystemGUI():
         self.move1Item(self.listRemainCells, self.listCells)
         
         self.program.handleNextAction(self.listCells[0][1], self.listCells[0][0])
-        self.program.getMap(f"{self.fileName}.txt")
-        self.program.agentHealth = 100
 
         self.clearFrame(self.frame3)  
         self.curNumState = 0
@@ -320,6 +341,21 @@ class SystemGUI():
         canvas.create_line(x, y, x + 50, y, fill=color, width=line_width)
         canvas.create_polygon(x + 50 + 4, y, x + 50 - arrow_size, y - arrow_size, x + 50 - arrow_size, y + arrow_size, fill=color)
 
+    def getTotalScore(self):
+        self.score = 0
+        scoreDict = {
+            'move forward': -10,
+            'turn left': -10,
+            'turn right': -10,
+            'shoot': -100,
+            'climb': 10,
+            'heal': -10,
+            'grab': -10
+        }
+        self.score += getNumGold(self.program) * 5000
+        for index, action in enumerate(self.listCells):
+            if index != len(self.listCells) - 1:
+                self.score += scoreDict[action[1]]
 
     # 0: Up, 1: Right, 2: Down, 3: Left
     def draw_all_direction(self, canvas, x, y, color = "lightblue"):
@@ -467,7 +503,8 @@ class SystemGUI():
         # self.add_Wumpus_Kill(self.subFrame3c2, 0.27, 95, 95, 100)
 
         self.subFrame3c2.create_text(50, 165, text="Scores: ", font =("Arial", 16), fill="Red")
-        self.subFrame3c2.create_text(135, 165, text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
+        _ = self.getTotalScore()
+        self.subFrame3c2.create_text(135, 165, text=f"{self.score}", font =("Arial", 18), fill="Red")
 
         self.subFrame3c2.create_text(60, 198,  text="Direction: ", font =("Arial", 16), fill="Red")
         # 0: Up, 1: Right, 2: Down, 3: Left
@@ -583,7 +620,8 @@ class SystemGUI():
         self.add_Wumpus_Kill(self.subFrame3c2, 0.27, 100, 95,  getNumDeadWumpus(self.program))
 
         self.subFrame3c2.create_rectangle(100, 150, 170, 180, fill="white", outline="white")
-        self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
+        _ = self.getTotalScore()
+        self.subFrame3c2.create_text(135, 165,  text=f"{self.score}", font =("Arial", 18), fill="Red")
 
         x_soud = cur_agent[0][0] 
         y_soud = cur_agent[0][1]
@@ -672,7 +710,8 @@ class SystemGUI():
         self.add_Wumpus_Kill(self.subFrame3c2, 0.27, 100, 95, getNumDeadWumpus(self.program))
 
         self.subFrame3c2.create_rectangle(100, 150, 170, 180, fill="white", outline="white")
-        self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
+        _ = self.getTotalScore()
+        self.subFrame3c2.create_text(135, 165,  text=f"{self.score}", font =("Arial", 18), fill="Red")
         
         x_soud = cur_agent[0][0] 
         y_soud = cur_agent[0][1]

@@ -127,8 +127,7 @@ class Program:
         if self.mapHPotion[self.x][self.y] == True:
             self.mapHPotion[self.x][self.y] = False
             self.numPotion += 1
-        
-        if self.mapGold[self.x][self.y] == True:
+        elif self.mapGold[self.x][self.y] == True:
             self.mapGold[self.x][self.y] = False
             self.gameScore += 5000
             
@@ -179,6 +178,7 @@ class GUIProgram:
         self.numPotion = 0
         self.isSound = False
         self.totalWumpus = 0
+        self.totalGold = 0
         
         self.isGameWin = False
         self.gameScore = 0
@@ -192,6 +192,12 @@ class GUIProgram:
         self.dictNumWumpus = {}
     
     def getMap(self, file):
+        self.mapWumpus = [[False for _ in range(10)] for _ in range(10)] # 100
+        self.mapPit = [[False for _ in range(10)] for _ in range(10)] # 200
+        self.mapPGas = [[False for _ in range(10)] for _ in range(10)] # 300
+        self.mapHPotion = [[False for _ in range(10)] for _ in range(10)] # 400
+        self.mapGold = [[False for _ in range(10)] for _ in range(10)] # 500
+        
         caveMap = readF(file)
         mapDict = {
             'W': self.mapWumpus,
@@ -221,6 +227,7 @@ class GUIProgram:
         self.numPotion = 0
         self.isSound = False
         self.totalWumpus = sum(self.dictNumWumpus[num] for num in self.dictNumWumpus)
+        self.totalGold = sum(curList.count(True) for curList in self.mapGold)
         
         self.isGameWin = False
         self.gameScore = 0
@@ -297,8 +304,7 @@ class GUIProgram:
         if nextStep in self.listPickedHPotion:
             self.mapHPotion[self.x][self.y] = True
             self.numPotion -= 1
-            
-        if nextStep in self.listGold:
+        elif nextStep in self.listGold:
             self.mapGold[self.x][self.y] = True
             self.gameScore -= 5000
         
@@ -307,9 +313,8 @@ class GUIProgram:
         if self.mapHPotion[self.x][self.y] == True:
             self.mapHPotion[self.x][self.y] = False
             self.numPotion += 1
-            self.listPickedHPotion[self.curStep] = [self.x, self.y]
-            
-        if self.mapGold[self.x][self.y] == True:
+            self.listPickedHPotion[self.curStep] = [self.x, self.y]  
+        elif self.mapGold[self.x][self.y] == True:
             self.mapGold[self.x][self.y] = False
             self.gameScore += 5000
             self.listGold[self.curStep] = [self.x, self.y]
@@ -413,11 +418,14 @@ def getAllElements(program):
         
 def getNumDeadWumpus(program):
     return program.totalWumpus - sum(program.dictNumWumpus[num] for num in program.dictNumWumpus)
+     
+def getNumGold(program):
+    return program.totalGold - sum(curList.count(True) for curList in program.mapGold)
         
 if __name__ == "__main__":
     ABC = GUIProgram()
     ABC.getMap('test.txt')
-    # print(getNumDeadWumpus(ABC))
+    # print(getNumGold(ABC))
     # ABC.handleNextAction('turn right', (0, 0))
     # print(ABC.gameScore, ABC.x, ABC.y, ABC.direction)
     # ABC.handleNextAction('move forward', (0, 0))
