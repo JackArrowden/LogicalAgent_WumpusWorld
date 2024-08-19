@@ -683,7 +683,6 @@ class SystemGUI():
             self.program.handleNextAction(action[1], action[0])
             self.tempCells.pop(0)
             
-        print(cur_agent[1])
         if cur_agent[1] in ['shoot', 'grab', 'climb', 'heal']:
             self.tempCells.append(cur_agent)
         else:
@@ -734,7 +733,7 @@ class SystemGUI():
         if self.program.isSound:
             kwargs[0].create_text( y_soud*65, x_soud*65, text = "Grraaahh!", fill = "red", font = ('Courier', 18, 'bold'), anchor='nw')
 
-        if self.program.isGameWin:
+        if self.listCells[len(self.listCells) - 1][1] == 'climb':
             # kwargs[0].create_rectangle(3*65-9, 4*65-9, 7*65+9, 6*65+9, fill="white", outline="white")
             self.add_You_won(kwargs[0], 0.1, 3*65 + 5, 3*65 + 5)
 
