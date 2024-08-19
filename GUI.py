@@ -1,6 +1,6 @@
 import tkinter as tk
 import file
-from Program import Program, GUIProgram, getAllElements, getAllPercepts
+from Program import *
 from Agent import Agent
 from PIL import Image, ImageTk
 
@@ -60,6 +60,7 @@ class SystemGUI():
         self.entry.bind("<FocusIn>", self.entryOnFocus)
         self.entry.bind("<FocusOut>", self.entryOnBlur)  
         self.entry.bind("<KeyPress>", self.resetText)
+        self.entry.bind('<Return>', lambda event: self.enterBtn.invoke())
 
         ### SubFrame
         self.subFrame = tk.Frame(self.frame1)
@@ -68,7 +69,8 @@ class SystemGUI():
         ## Enter button
         self.enterBtn = tk.Button(self.subFrame, text = "Enter", command = self.getFileName, bg = "#323232", fg = "#FAFAFA", width = 40, height = 2, cursor = "hand2")
         self.enterBtn.pack(pady = (5, 10))
-        
+
+        # self.subFrame.focus_set()
         ## Exit button
         self.exitBtn1 = tk.Button(self.subFrame, text = "Exit", command = self.exit, bg = "#323232", fg = "#FAFAFA", width = 40, height = 2, cursor = "hand2")
         self.exitBtn1.pack(pady = (5, 10))
@@ -103,12 +105,6 @@ class SystemGUI():
             self.entry.insert("1.0", self.text2)  
             self.entry.mark_set("insert", "1.0")
         else:
-            # resultRead = file.readF(self.fileName)
-            # self.col = len(resultRead[0])
-            # self.row = len(resultRead)
-            # self.mapPercepts = Program.getAllPercepts
-            # self.mapPercepts = getAllPercepts(self.program)
-            # self.mapElements = getAllElements(self.program)
             environment = Program(f"{self.fileName}.txt")
             agent = Agent()
             agent.init(environment)
@@ -147,7 +143,6 @@ class SystemGUI():
                 x2 = x1 + cell_size
                 y2 = y1 + cell_size
                 canvas.create_rectangle(x1, y1, x2, y2, fill="#CCCCCC", outline="black")
-                # canvas.create_rectangle(x1, y1, x2, y2, fill="black", outline="black")
 
         for cell in self.listCells:
             canvas.create_rectangle(cell[0][1]*cell_size, cell[0][0]*cell_size, (cell[0][1]+1)*cell_size, (cell[0][0]+1)*cell_size, fill="white", outline="black")
@@ -186,14 +181,11 @@ class SystemGUI():
         canvas.create_oval(x1, y1, x2, y2, fill=color, outline=color)
     
     def drawElements(self, canvas):
-        # filePath = ["test/wumpus.jpg", "test/pit.jpg", "test/poisonGas.jpg","test/healing.jpg", "test/gold.jpg"]
-        # filePath = ["wumpus.png", "test/2.png", "test/3.png", "test/4.png", "test/5.png"]
         TEXT = ["W", 'P', 'G', 'H', 'T']
         for i in range(10):
             for j in range(10):
                 for k in range(5):
                     if self.mapElements[i][j][k]:
-                        # self.add_image(canvas, filePath[k], i, j, 20, 19 + (22 if k%2 else 0), 4 +(20* int(k/2)) )
                         x = j*self.cell_size +  29 + (23 if k%2 else 0)
                         y = i*self.cell_size + 12 +(20* int(k/2)) 
                         canvas.create_text(x, y,  text=TEXT[k], font=("Arial", 15), fill="Red")
@@ -216,7 +208,7 @@ class SystemGUI():
         self.drawElements(canvas)
 
         curPos = self.listCells[len(self.listCells)-1]
-        self.add_image(canvas, "asd.jpg", curPos[0][0], curPos[0][1], 18, 41, 44)
+        self.add_image(canvas, "GUI_imagine/asd.jpg", curPos[0][0], curPos[0][1], 18, 41, 44)
 
     def draw_HP(self, canvas, x, y, size, HP = 100, width = 10):
         len = float(size / 100)
@@ -334,7 +326,7 @@ class SystemGUI():
         self.draw_right(canvas, x, y, color=color)
 
     def add_Healing_potion(self,canvas, image_size = 30, x=0, y=0, quantity = 6):
-        image_path = "Healing_potion.png"
+        image_path = "GUI_imagine/Healing_potion.png"
         image = Image.open(image_path)
 
         original_width, original_height = image.size
@@ -352,7 +344,28 @@ class SystemGUI():
         canvas.create_image(x , y, anchor='nw', image=photo)
         canvas.image = photo
     
-        canvas.create_text( x + 20, y + new_height - 33, text = f" X {quantity} ", font=("Arial", 23), fill="Red", anchor ='nw')
+        canvas.create_text( x + 19, y + new_height - 33, text = f" x {quantity} ", font=("Arial", 15), fill="Red", anchor ='nw')
+
+    def add_Wumpus_Kill(self,canvas, image_size = 30, x=0, y=0, quantity = 6):
+        image_path = "GUI_imagine/wumpus.png"
+        image = Image.open(image_path)
+
+        original_width, original_height = image.size
+
+        scale_factor = image_size
+
+        new_width = int(original_width * scale_factor)
+        new_height = int(original_height * scale_factor)
+
+        resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        photo = ImageTk.PhotoImage(resized_image)
+        self.images.append(photo)  
+
+        canvas.create_image(x , y, anchor='nw', image=photo)
+        canvas.image = photo
+    
+        canvas.create_text( x + 47, y + new_height - 36, text = f" x {quantity} ", font=("Arial", 15), fill="Red", anchor ='nw')
 
     def stepByStepFrame(self, isAuto): #### Frame 3        
         # if self.isResetList:
@@ -391,6 +404,17 @@ class SystemGUI():
             self.nextBtn1 = tk.Button(self.subFrame3a, state = "disabled", text = "Next", bg = "lightgray", fg = "white", width = 20, height = 2)
             self.nextBtn2 = tk.Button(self.subFrame3a, text = "Next", command = lambda: self.nextMap(isAuto = False, kwargs = [self.subFrame3b, self.prevBtn1, self.prevBtn2, self.nextBtn1, self.nextBtn2, self.subFrame3c1, self.subFrame3c2]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
             self.nextBtn2.pack(pady = (5, 5))
+            def on_next_press(event):
+                self.nextBtn1.invoke()
+                self.nextBtn2.invoke()
+
+            def on_prev_press(event):
+                self.prevBtn1.invoke()
+                self.prevBtn2.invoke()
+
+            self.subFrame3a.focus_set()
+            self.subFrame3a.bind('<Right>', on_next_press)
+            self.subFrame3a.bind('<Left>', on_prev_press)
         else:
             self.slowDown1 = tk.Button(self.subFrame3a, text = "Slow down", command = lambda: self.slowDownFunc(kwargs = [self.slowDown1, self.slowDown2, self.speedUp1, self.speedUp2]), bg = "#323232", fg = "#FAFAFA", width = 20, height = 2, cursor = "hand2")
             self.slowDown2 = tk.Button(self.subFrame3a, state = "disabled", text = "Slow down", bg = "lightgray", fg = "white", width = 20, height = 2)
@@ -409,7 +433,7 @@ class SystemGUI():
         
         ### Sub frame 3 b
         self.subFrame3b = tk.Canvas(self.frame3, bg = "white", width = self.width, height = self.height)
-        self.subFrame3b.pack(side = tk.LEFT, expand=True, anchor='center', pady = (0, 30), padx = (0, 15))  
+        self.subFrame3b.pack(side = tk.LEFT, expand=True, anchor='center', pady = (0, 0), padx = (0, 15))  
         
         self.draw_map(self.subFrame3b)
 
@@ -418,23 +442,26 @@ class SystemGUI():
         self.subFrame3c.pack(side = tk.LEFT,expand=True, anchor='center', padx = (5, 25))    
 
         ### Sub frame 3 c1
-        self.subFrame3c1 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.07)
+        self.subFrame3c1 = tk.Canvas(self.subFrame3c, bg = "white", width = 220, height = self.height * 0.07)
         self.subFrame3c1.pack(anchor='center', padx = (25, 5))
 
         ## Cur state
         curStep = "Iteration: " + str(self.curNumState)
-        self.subFrame3c1.create_text(100, 22, text = curStep, fill = "black", font = self.font2)
+        self.subFrame3c1.create_text(110, 22, text = curStep, fill = "black", font = self.font2)
         
         ### Sub frame 3 c2
-        self.subFrame3c2 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.5)
+        self.subFrame3c2 = tk.Canvas(self.subFrame3c, bg = "white", width = 220, height = self.height * 0.5)
         self.subFrame3c2.pack(anchor='center', padx = (25, 5))
 
-        self.subFrame3c2.create_text(100, 20,  text="AGENT: ", font = self.font2, fill="Red")
+        self.subFrame3c2.create_text(110, 20,  text="AGENT: ", font = self.font2, fill="Red")
         self.subFrame3c2.create_text(30, 55,  text="HP: ", font =("Arial", 16), fill="Red")
-        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
+        self.draw_HP(self.subFrame3c2, 10, 78, 190, HP = self.program.agentHealth, width = 15)
 
         self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
-        # self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, 10)
+        # self.add_Healing_potion(self.subFrame3c2, 0.12, 10, 95, 100)
+
+        self.add_Wumpus_Kill(self.subFrame3c2, 0.27, 100, 95, getNumDeadWumpus(self.program))
+        # self.add_Wumpus_Kill(self.subFrame3c2, 0.27, 95, 95, 100)
 
         self.subFrame3c2.create_text(50, 165, text="Scores: ", font =("Arial", 16), fill="Red")
         self.subFrame3c2.create_text(135, 165, text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
@@ -453,37 +480,37 @@ class SystemGUI():
             self.draw_left(self.subFrame3c2, 102, 267, color = 'red')
 
         ### Sub frame 3 c3
-        self.subFrame3c3 = tk.Canvas(self.subFrame3c, bg = "white", width = 200, height = self.height * 0.42)
+        self.subFrame3c3 = tk.Canvas(self.subFrame3c, bg = "white", width = 220, height = self.height * 0.42)
         self.subFrame3c3.pack(anchor='center', padx = (25, 5))  
 
         ## Percepts
         perTitle = "Percepts:"     
-        self.subFrame3c3.create_text(100, 20, text = perTitle, fill = "black", font = self.font2)
+        self.subFrame3c3.create_text(110, 20, text = perTitle, fill = "black", font = self.font2)
 
         ## Percepts 1
         perA = "Stench"
-        self.draw_dot(self.subFrame3c3, 0.85, 0.05, "#3CB371", 5.5, 9, 10)     
-        self.subFrame3c3.create_text(50, 65, text = perA, fill = "black", font = self.font3)
+        self.draw_dot(self.subFrame3c3, 0.85, 0.12, "#3CB371", 5.5, 9, 10)     
+        self.subFrame3c3.create_text(55, 65, text = perA, fill = "black", font = self.font3)
 
         ## Percepts 1
         perA = "Breeze"  
-        self.draw_dot(self.subFrame3c3, 0.625, 1.6, "#8EE5EE", 5.5, 9, 25)  
-        self.subFrame3c3.create_text(150, 65, text = perA, fill = "black", font = self.font3)
+        self.draw_dot(self.subFrame3c3, 0.625, 1.7, "#8EE5EE", 5.5, 9, 25)  
+        self.subFrame3c3.create_text(160, 65, text = perA, fill = "black", font = self.font3)
 
         ## Percepts 2
         perA = "Whiff" 
-        self.draw_dot(self.subFrame3c3, 0.85, 0.05, "#8E388E", 5.5, 9, 40)    
-        self.subFrame3c3.create_text(50, 95, text = perA, fill = "black", font = self.font3)
+        self.draw_dot(self.subFrame3c3, 0.85, 0.12, "#8E388E", 5.5, 9, 40)    
+        self.subFrame3c3.create_text(51, 95, text = perA, fill = "black", font = self.font3)
 
         ## Percepts 2
         perA = "Glow"
-        self.draw_dot(self.subFrame3c3, 0.625, 1.6, "#FFF68F", 5.5, 9, 55)     
-        self.subFrame3c3.create_text(150, 95, text = perA, fill = "black", font = self.font3)
+        self.draw_dot(self.subFrame3c3, 0.625, 1.7, "#FFF68F", 5.5, 9, 55)     
+        self.subFrame3c3.create_text(155, 95, text = perA, fill = "black", font = self.font3)
 
         ## Objects
         objTitle = "Objects:"
         self.subFrame3c3.pack( expand=True, anchor='center')     
-        self.subFrame3c3.create_text(100, 150, text = objTitle, fill = "black", font = self.font2)
+        self.subFrame3c3.create_text(110, 150, text = objTitle, fill = "black", font = self.font2)
 
         ## Objects 1
         objA = "Wumpus"
@@ -492,8 +519,8 @@ class SystemGUI():
 
         ## Objects 1
         objA = "Pit"
-        self.subFrame3c3.create_text(120, 190,  text='P', font=("Arial", 15), fill="Red")
-        self.subFrame3c3.create_text(145, 190, text = objA, fill = "black", font = self.font3)
+        self.subFrame3c3.create_text(135, 190,  text='P', font=("Arial", 15), fill="Red")
+        self.subFrame3c3.create_text(160, 190, text = objA, fill = "black", font = self.font3)
 
         ## Objects 2
         objA = "Poison"
@@ -502,8 +529,8 @@ class SystemGUI():
 
         ## Objects 2
         objA = "Health"
-        self.subFrame3c3.create_text(120, 220,  text='H', font=("Arial", 15), fill="Red")
-        self.subFrame3c3.create_text(160, 220, text = objA, fill = "black", font = self.font3)
+        self.subFrame3c3.create_text(135, 220,  text='H', font=("Arial", 15), fill="Red")
+        self.subFrame3c3.create_text(175, 220, text = objA, fill = "black", font = self.font3)
 
         ## Objects 3
         objA = "Treasure (Gold)"
@@ -518,7 +545,7 @@ class SystemGUI():
         self.curNumState = self.curNumState - 1
         curStep = "Iteration: " + str(self.curNumState)
         self.clearCanvas(kwargs[5])
-        kwargs[5].create_text(100, 22, text = curStep, fill = "black", font = self.font2)
+        kwargs[5].create_text(110, 22, text = curStep, fill = "black", font = self.font2)
             
         cur = (0, 0)
             
@@ -534,10 +561,11 @@ class SystemGUI():
 
         self.draw_map(kwargs[0])
 
-        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
+        self.draw_HP(self.subFrame3c2, 10, 78, 190, HP = self.program.agentHealth, width = 15)
        
-        self.subFrame3c2.create_rectangle(20, 95, 182, 140, fill="white", outline="white")
+        self.subFrame3c2.create_rectangle(20, 95, 219, 150, fill="white", outline="white")
         self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
+        self.add_Wumpus_Kill(self.subFrame3c2, 0.27, 100, 95,  getNumDeadWumpus(self.program))
 
         self.subFrame3c2.create_rectangle(100, 150, 170, 180, fill="white", outline="white")
         self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
@@ -561,7 +589,7 @@ class SystemGUI():
             y_soud -= 1
 
         if self.program.isSound:
-            kwargs[0].create_text( y_soud*65, x_soud*65, text = "Grraaahh!", fill = "red", font = ('Blood Drip', 18, 'bold'), anchor='nw')
+            kwargs[0].create_text( y_soud*65, x_soud*65, text = "Grraaahh!", fill = "red", font = ('Courier', 18, 'bold'), anchor='nw')
 
         if len(self.listCells) <= 1:
             kwargs[1].pack(pady = (5, 5))
@@ -580,10 +608,10 @@ class SystemGUI():
         curStep = "Iteration: " + str(self.curNumState)
         if isAuto:
             self.clearCanvas(kwargs[2])
-            kwargs[2].create_text(100, 22, text = curStep, fill = "black", font = self.font2)
+            kwargs[2].create_text(110, 22, text = curStep, fill = "black", font = self.font2)
         else:
             self.clearCanvas(kwargs[5])
-            kwargs[5].create_text(100, 22, text = curStep, fill = "black", font = self.font2)
+            kwargs[5].create_text(110, 22, text = curStep, fill = "black", font = self.font2)
         
         # cur = (0, 0)
         if len(self.listRemainCells) > 0:
@@ -609,10 +637,11 @@ class SystemGUI():
         #         y2 = y1 + cell_size
         #         self.subFrame3c2.create_rectangle(x1, y1, x2, y2, fill="", outline="black")
 
-        self.draw_HP(self.subFrame3c2, 10, 78, 180, HP = self.program.agentHealth, width = 15)
+        self.draw_HP(self.subFrame3c2, 10, 78, 190, HP = self.program.agentHealth, width = 15)
 
-        self.subFrame3c2.create_rectangle(20, 95, 182, 140, fill="white", outline="white")
+        self.subFrame3c2.create_rectangle(0, 95, 219, 150, fill="white", outline="white")
         self.add_Healing_potion(self.subFrame3c2, 0.12, 20, 95, self.program.numPotion)
+        self.add_Wumpus_Kill(self.subFrame3c2, 0.27, 100, 95, getNumDeadWumpus(self.program))
 
         self.subFrame3c2.create_rectangle(100, 150, 170, 180, fill="white", outline="white")
         self.subFrame3c2.create_text(135, 165,  text=f"{self.program.gameScore}", font =("Arial", 18), fill="Red")
@@ -636,7 +665,11 @@ class SystemGUI():
             y_soud -= 1
 
         if self.program.isSound:
-            kwargs[0].create_text( y_soud*65, x_soud*65, text = "Grraaahh!", fill = "red", font = ('Blood Drip', 18, 'bold'), anchor='nw')
+            kwargs[0].create_text( y_soud*65, x_soud*65, text = "Grraaahh!", fill = "red", font = ('Courier', 18, 'bold'), anchor='nw')
+
+        if self.program.isGameWin:
+            # kwargs[0].create_rectangle(3*65-9, 4*65-9, 7*65+9, 6*65+9, fill="white", outline="white")
+            self.add_You_won(kwargs[0], 0.1, 3*65 + 5, 3*65 + 5)
 
         if not isAuto:
             if not len(self.listCells) == 0:
@@ -655,7 +688,26 @@ class SystemGUI():
                 temp = kwargs
                 curid = kwargs[1].after(self.autoRunTime[1][self.autoRunTime[0]], lambda: self.nextMap(isAuto = True, kwargs = temp))
                 self.idAfter.add(curid)
-  
+
+    def add_You_won(self,canvas, image_size = 1, x=0, y=0):
+        image_path = "GUI_imagine/You_won.png"
+        image = Image.open(image_path)
+
+        original_width, original_height = image.size
+
+        scale_factor = image_size
+
+        new_width = int(original_width * scale_factor)
+        new_height = int(original_height * scale_factor)
+
+        resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        
+        photo = ImageTk.PhotoImage(resized_image)
+        self.images.append(photo)  
+
+        canvas.create_image(x , y, anchor='nw', image=photo)
+        canvas.image = photo
+
     def clearCanvas(self, canvas):
         for item in canvas.find_all():
             canvas.delete(item)
