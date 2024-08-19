@@ -233,7 +233,7 @@ class SystemGUI():
         self.drawElements(canvas)
 
         curPos = self.listCells[len(self.listCells)-1]
-        self.add_image(canvas, "GUI_imagine/asd.jpg", curPos[0][0], curPos[0][1], 18, 41, 44)
+        self.add_image(canvas, "GUI_imagine/agent.png", curPos[0][0], curPos[0][1], 18, 41, 44)
 
     def draw_HP(self, canvas, x, y, size, HP = 100, width = 10):
         len = float(size / 100)
