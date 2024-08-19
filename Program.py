@@ -246,6 +246,7 @@ class GUIProgram:
             "turn left": lambda: self.handlePrevTurn(False),
             "turn right": lambda: self.handlePrevTurn(True)
         }
+        # print('dir', self.direction, 'coor', self.x, self.y, action)
         if dictAction[action] != None:
             dictAction[action]()
         else:
@@ -270,6 +271,7 @@ class GUIProgram:
             "turn left": lambda: self.handleNextTurn(False),
             "turn right": lambda: self.handleNextTurn(True)
         }
+        # print('dir', self.direction, 'coor', self.x, self.y, action)
         if dictAction[action] != None:
             dictAction[action]()
         else:
@@ -281,11 +283,11 @@ class GUIProgram:
         
     def handlePrevTurn(self, isAdd = True):
         self.gameScore += 10
-        self.direction = (self.direction + 1) % 4 if isAdd else (self.direction - 1) % 4
+        self.direction = (self.direction - 1) % 4 if isAdd else (self.direction + 1) % 4
         
     def handleNextTurn(self, isAdd = True):
         self.gameScore -= 10
-        self.direction = (self.direction - 1) % 4 if isAdd else (self.direction + 1) % 4
+        self.direction = (self.direction + 1) % 4 if isAdd else (self.direction - 1) % 4
         
     def handlePrevGrab(self):
         self.gameScore += 10
@@ -312,10 +314,18 @@ class GUIProgram:
             
     def handlePrevShoot(self):
         self.gameScore += 100
+        coorDictNext = [[self.x - 1, self.y] if self.x != 9 else None, 
+                        [self.x, self.y + 1] if self.y != 9 else None, 
+                        [self.x + 1, self.y] if self.x != 0 else None, 
+                        [self.x, self.y - 1] if self.y != 0 else None]
+        coorXY = coorDictNext[self.direction] 
         nextStep = self.curStep + 1
         if nextStep in self.listKilledWumpus:
-            self.dictNumWumpus[(self.listKilledWumpus[nextStep][0], self.listKilledWumpus[nextStep][1])] += 1
-            self.mapWumpus[self.listKilledWumpus[nextStep][0]][self.listKilledWumpus[nextStep][1]] = True
+            # print('dirrev', self.direction)
+            # print(self.dictNumWumpus)
+            # print(coorXY[0], coorXY[1])
+            self.dictNumWumpus[(coorXY[0], coorXY[1])] += 1
+            self.mapWumpus[coorXY[0]][coorXY[1]] = True
             
     def handleNextShoot(self):
         self.gameScore -= 100
@@ -325,6 +335,8 @@ class GUIProgram:
                         [self.x, self.y - 1] if self.y != 0 else None]
         coorXY = coorDictNext[self.direction] 
         if coorXY is not None and self.mapWumpus[coorXY[0]][coorXY[1]] == True:
+            # print('dir', self.direction)
+            # print('next', self.dictNumWumpus)
             self.dictNumWumpus[(coorXY[0], coorXY[1])] -= 1
             self.listKilledWumpus[self.curStep] = [coorXY[0], coorXY[1]]
             
