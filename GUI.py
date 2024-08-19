@@ -146,8 +146,8 @@ class SystemGUI():
                 y1 = i * cell_size
                 x2 = x1 + cell_size
                 y2 = y1 + cell_size
-                # canvas.create_rectangle(x1, y1, x2, y2, fill="#CCCCCC", outline="black")
-                canvas.create_rectangle(x1, y1, x2, y2, fill="black", outline="black")
+                canvas.create_rectangle(x1, y1, x2, y2, fill="#CCCCCC", outline="black")
+                # canvas.create_rectangle(x1, y1, x2, y2, fill="black", outline="black")
 
         for cell in self.listCells:
             canvas.create_rectangle(cell[0][1]*cell_size, cell[0][0]*cell_size, (cell[0][1]+1)*cell_size, (cell[0][0]+1)*cell_size, fill="white", outline="black")
@@ -214,7 +214,7 @@ class SystemGUI():
         self.create_grid(canvas, self.row, self.col, self.cell_size)
         self.drawPercepts(canvas)
         self.drawElements(canvas)
-        
+
         curPos = self.listCells[len(self.listCells)-1]
         self.add_image(canvas, "asd.jpg", curPos[0][0], curPos[0][1], 18, 41, 44)
 
@@ -352,7 +352,7 @@ class SystemGUI():
         canvas.create_image(x , y, anchor='nw', image=photo)
         canvas.image = photo
     
-        canvas.create_text( x + 130, y + new_height - 25, text = f"+ {quantity - 5} ", font=("Arial", 23), fill="Red")
+        canvas.create_text( x + 20, y + new_height - 33, text = f" X {quantity} ", font=("Arial", 23), fill="Red", anchor ='nw')
 
     def stepByStepFrame(self, isAuto): #### Frame 3        
         # if self.isResetList:
