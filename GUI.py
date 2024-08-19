@@ -40,6 +40,9 @@ class SystemGUI():
         self.curNumState = 0
         self.listCells = []
         self.listRemainCells = []
+        self.tempCells = []
+        self.tempRemainCells = []
+        self.isNext = True
 
         self.frame1 = tk.Frame(self.root)
         self.frame2 = tk.Frame(self.root)
@@ -557,7 +560,19 @@ class SystemGUI():
 
         cur_agent = self.listRemainCells[0]
 
-        self.program.handlePrevAction(cur_agent[1], cur_agent[0])
+        if self.isNext:
+            self.tempRemainCells.clear()
+            if cur_agent[1] in ['shoot', 'grab', 'climb', 'heal']:
+                self.program.handlePrevAction(cur_agent[1], cur_agent[0])
+                self.program.curStep += 1
+            self.isNext = False
+        
+        action = self.listCells[len(self.listCells) - 1]
+        if cur_agent[1] in ['move forward', 'turn left', 'turn right']:
+            self.program.handlePrevAction(cur_agent[1], cur_agent[0])
+
+        if action[1] in ['shoot', 'grab', 'climb', 'heal']:
+            self.program.handlePrevAction(action[1], action[0])
 
         self.draw_map(kwargs[0])
 
@@ -620,9 +635,22 @@ class SystemGUI():
             
         self.clearCanvas(kwargs[0])
 
-        cur_agent = self.listCells[len(self.listCells)-1]
+        if not self.isNext:
+            self.tempCells.clear()
+            self.isNext = True
 
-        self.program.handleNextAction(cur_agent[1], cur_agent[0])
+        cur_agent = self.listCells[len(self.listCells)-1]
+        while self.tempCells:
+            action = self.tempCells[0]
+            self.program.handleNextAction(action[1], action[0])
+            self.tempCells.pop(0)
+            
+        print(cur_agent[1])
+        if cur_agent[1] in ['shoot', 'grab', 'climb', 'heal']:
+            self.tempCells.append(cur_agent)
+        else:
+            self.program.handleNextAction(cur_agent[1], cur_agent[0])
+        
         
         self.draw_map(kwargs[0])
 
